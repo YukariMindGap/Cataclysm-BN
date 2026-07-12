@@ -130,7 +130,7 @@
       [ "carbondioxide_tank", 1 ],
       [ "tongs", 1 ],
       [ "tourist_table", 1 ],
-      [ "pump_hand", 5 ],
+      [ "pump_fluid", 5 ],
       [ "pump_gas", 3 ],
       [ "pump_electric", 1 ]
     ]
@@ -297,7 +297,7 @@
       [ "angle_grinder", 5 ],
       [ "welder", 10 ],
       [ "clamp", 10 ],
-      [ "pump_hand", 10 ],
+      [ "pump_fluid", 10 ],
       [ "pump_gas", 8 ],
       [ "pump_electric", 5 ]
     ]
