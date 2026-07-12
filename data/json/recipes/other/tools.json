@@ -2668,8 +2668,20 @@
     "autolearn": true,
     "book_learn": [ [ "advanced_electronics", 3 ], [ "textbook_electronics", 3 ], [ "textbook_mechanics", 5 ], [ "manual_mechanics", 4 ] ],
     "using": [ [ "welding_standard", 4 ], [ "soldering_standard", 5 ] ],
-    "qualities": [ { "id": "SCREW_FINE", "level": 1 }, { "id": "SCREW", "level": 1 }, { "id": "WRENCH", "level": 1 }, { "id": "SAW_M", "level": 1 } ],
-    "components": [ [ [ "pipe", 2 ] ], [ [ "hose", 1 ] ], [ [ "plastic_chunk", 3 ] ], [ [ "scrap", 4 ] ], [ [ "motor_small", 1 ] ], [ [ "cable", 5 ] ] ]
+    "qualities": [
+      { "id": "SCREW_FINE", "level": 1 },
+      { "id": "SCREW", "level": 1 },
+      { "id": "WRENCH", "level": 1 },
+      { "id": "SAW_M", "level": 1 }
+    ],
+    "components": [
+      [ [ "pipe", 2 ] ],
+      [ [ "hose", 1 ] ],
+      [ [ "plastic_chunk", 3 ] ],
+      [ [ "scrap", 4 ] ],
+      [ [ "motor_small", 1 ] ],
+      [ [ "cable", 5 ] ]
+    ]
   },
   {
     "result": "sickle",

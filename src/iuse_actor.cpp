@@ -8583,7 +8583,7 @@ int fluid_pickup_actor::use( player &p, item &it, bool, const tripoint_bub_ms & 
     // After the transfer, merge excess back or clean up empty item
     if( target_item.charges == 0 ) {
         // Liquid was fully consumed; remove empty item from its stack
-        auto erase_from_stack = [&]( auto &stack ) {
+        auto erase_from_stack = [&]( auto & stack ) {
             for( auto it = stack.begin(); it != stack.end(); ++it ) {
                 if( &( *it ) == &target_item ) {
                     stack.erase( it );
