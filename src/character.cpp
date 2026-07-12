@@ -8306,10 +8306,12 @@ bool Character::invoke_item( item *used, const std::string &method, const tripoi
     if( charges_used == 0 ) {
         return false;
     }
+
     // Prevent accessing the item as it may have been deleted by the invoked iuse function.
 
     if( used->is_tool() || used->is_medication() || used->get_contained().is_medication() ) {
-        return consume_charges( *actually_used, charges_used );
+        consume_charges( *actually_used, charges_used );
+        return true;
     } else if( used->is_bionic() || used->is_deployable() || method == "place_trap" ) {
         used->detach();
         return true;
@@ -8321,7 +8323,7 @@ bool Character::invoke_item( item *used, const std::string &method, const tripoi
         return true;
     }
 
-    return false;
+    return true;
 }
 
 detached_ptr<item> Character::dispose_item( detached_ptr<item> &&obj, const std::string &prompt )

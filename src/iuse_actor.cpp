@@ -8523,9 +8523,9 @@ int fluid_pickup_actor::use( player &p, item &it, bool, const tripoint_bub_ms & 
             continue;
         }
 
-        for( item &mapped : here.i_at( pos ) ) {
-            if( mapped.made_of( LIQUID ) ) {
-                candidates.emplace_back( pos, &mapped, mapped.tname(), false );
+        for( item *mapped : here.i_at( pos ) ) {
+            if( mapped->made_of( LIQUID ) ) {
+                candidates.emplace_back( pos, mapped, mapped->tname(), false );
             }
         }
 
@@ -8533,10 +8533,10 @@ int fluid_pickup_actor::use( player &p, item &it, bool, const tripoint_bub_ms & 
         if( veh ) {
             vehicle &v = veh->vehicle();
             for( const vpart_reference &vp : v.get_all_parts() ) {
-                if( vp.part().is_vehicle_storage() ) {
-                    for( item &veh_item : vp.part().get_items() ) {
-                        if( veh_item.made_of( LIQUID ) ) {
-                            candidates.emplace_back( pos, &veh_item, veh_item.tname(), true );
+                if( vp.has_feature( VPFLAG_CARGO ) ) {
+                    for( item *veh_item : vp.part().get_items() ) {
+                        if( veh_item->made_of( LIQUID ) ) {
+                            candidates.emplace_back( pos, veh_item, veh_item->tname(), true );
                         }
                     }
                 }
@@ -8550,7 +8550,7 @@ int fluid_pickup_actor::use( player &p, item &it, bool, const tripoint_bub_ms & 
     }
 
     int sel = 0;
-    if( candidates.size() > 1 ) {
+    if( candidates.size() > 1 && !test_mode ) {
         uilist menu;
         menu.title = _( "Pick up which liquid?" );
         for( size_t i = 0; i < candidates.size(); ++i ) {
@@ -8583,9 +8583,9 @@ int fluid_pickup_actor::use( player &p, item &it, bool, const tripoint_bub_ms & 
     // After the transfer, merge excess back or clean up empty item
     if( target_item.charges == 0 ) {
         // Liquid was fully consumed; remove empty item from its stack
-        auto erase_from_stack = [&]( auto & stack ) {
+        auto erase_from_stack = [&]( auto && stack ) {
             for( auto it = stack.begin(); it != stack.end(); ++it ) {
-                if( &( *it ) == &target_item ) {
+                if( *it == &target_item ) {
                     stack.erase( it );
                     return true;
                 }
@@ -8598,8 +8598,8 @@ int fluid_pickup_actor::use( player &p, item &it, bool, const tripoint_bub_ms & 
             const optional_vpart_position veh = here.veh_at( chosen.pos );
             if( veh ) {
                 for( const vpart_reference &vp : veh->vehicle().get_all_parts() ) {
-                    if( vp.part().is_vehicle_storage() && !erased ) {
-                        vehicle_stack vs = vp.part().get_items();
+                    if( vp.has_feature( VPFLAG_CARGO ) && !erased ) {
+                        vehicle_stack vs = veh->vehicle().get_items( vp.part_index() );
                         erased = erase_from_stack( vs );
                     }
                 }
@@ -8621,7 +8621,7 @@ int fluid_pickup_actor::use( player &p, item &it, bool, const tripoint_bub_ms & 
     }
 
     p.mod_moves( -moves );
-    return charges_to_use;
+    return charges_to_use > 0 ? charges_to_use : 1;
 }
 
 auto fluid_pickup_actor::clone() const -> std::unique_ptr<iuse_actor>
@@ -8632,8 +8632,8 @@ auto fluid_pickup_actor::clone() const -> std::unique_ptr<iuse_actor>
 void fluid_pickup_actor::info( const item &, std::vector<iteminfo> &info ) const
 {
     info.emplace_back( "TOOL", _( "Max volume: " ) + format_volume( max_volume ) );
-    info.emplace_back( "TOOL", _( "Moves: " ) + to_string( moves ) );
+    info.emplace_back( "TOOL", _( "Moves: " ) + std::to_string( moves ) );
     if( charges_to_use > 0 ) {
-        info.emplace_back( "TOOL", _( "Charges per use: " ) + to_string( charges_to_use ) );
+        info.emplace_back( "TOOL", _( "Charges per use: " ) + std::to_string( charges_to_use ) );
     }
 }
