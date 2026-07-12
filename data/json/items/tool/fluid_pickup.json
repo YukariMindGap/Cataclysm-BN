@@ -1,0 +1,63 @@
+[
+  {
+    "id": "pump_hand",
+    "type": "GENERIC",
+    "category": "tools",
+    "name": { "str": "hand pump" },
+    "description": "A simple hand-operated diaphragm pump fitted with a flexible hose.  You can use it to pump liquids from the ground or vehicle cargo into containers.",
+    "weight": "1560 g",
+    "volume": "1250 ml",
+    "price": "30 USD",
+    "price_postapoc": "250 cent",
+    "to_hit": -2,
+    "bashing": 6,
+    "material": [ "plastic", "iron" ],
+    "symbol": ";",
+    "color": "light_red",
+    "use_action": { "type": "fluid_pickup", "max_volume": "1 L", "moves": 150 }
+  },
+  {
+    "id": "pump_gas",
+    "type": "TOOL",
+    "category": "tools_workshop",
+    "name": { "str": "gasoline pump" },
+    "description": "A portable gasoline-powered pump.  It runs on gasoline and can rapidly transfer large volumes of liquid from the ground or vehicle cargo into containers.  A small internal tank holds enough fuel for about 100 activations.",
+    "weight": "5000 g",
+    "volume": "2500 ml",
+    "price": "250 USD",
+    "price_postapoc": "15 USD",
+    "to_hit": -3,
+    "bashing": 10,
+    "material": [ "iron", "steel" ],
+    "symbol": ";",
+    "color": "red",
+    "ammo": "gasoline",
+    "max_charges": 100,
+    "initial_charges": 0,
+    "charges_per_use": 1,
+    "use_action": { "type": "fluid_pickup", "max_volume": "20 L", "moves": 300, "charges_to_use": 1 }
+  },
+  {
+    "id": "pump_electric",
+    "type": "TOOL",
+    "category": "tools_workshop",
+    "name": { "str": "electric pump" },
+    "description": "A heavy-duty battery-powered pump.  It can move large volumes of liquid from the ground or vehicle cargo into containers with minimal effort.  Uses a heavy battery cell.",
+    "weight": "3800 g",
+    "volume": "3000 ml",
+    "price": "350 USD",
+    "price_postapoc": "20 USD",
+    "to_hit": -3,
+    "bashing": 8,
+    "material": [ "plastic", "steel" ],
+    "symbol": ";",
+    "color": "light_blue",
+    "ammo": "battery",
+    "charges_per_use": 1,
+    "magazines": [
+      [ "battery", [ "heavy_battery_cell", "heavy_plus_battery_cell", "heavy_atomic_battery_cell", "heavy_disposable_cell" ] ]
+    ],
+    "magazine_well": "1000 ml",
+    "use_action": { "type": "fluid_pickup", "max_volume": "20 L", "moves": 200, "charges_to_use": 1 }
+  }
+]
