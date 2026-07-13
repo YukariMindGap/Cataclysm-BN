@@ -8310,8 +8310,7 @@ bool Character::invoke_item( item *used, const std::string &method, const tripoi
     // Prevent accessing the item as it may have been deleted by the invoked iuse function.
 
     if( used->is_tool() || used->is_medication() || used->get_contained().is_medication() ) {
-        consume_charges( *actually_used, charges_used );
-        return true;
+        return consume_charges( *actually_used, charges_used );
     } else if( used->is_bionic() || used->is_deployable() || method == "place_trap" ) {
         used->detach();
         return true;
