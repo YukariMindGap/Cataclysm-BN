@@ -1257,7 +1257,7 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
 
     GIVEN("a large puddle exceeds pump capacity") {
         here.add_item_or_charges(
-            water_pos, item::spawn("water", calendar::start_of_cataclysm, 5000));
+            water_pos, item::spawn("water", calendar::start_of_cataclysm, 500));
 
         AND_GIVEN("player has a hand fluid pump (1 L max)") {
             auto tool = item::spawn("pump_fluid");
@@ -1301,8 +1301,10 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
             auto tool = item::spawn("pump_electric");
             item& elec_pump = *tool;
             // Load a battery into the pump
-            elec_pump.put_in(item::spawn(
-                "heavy_battery_cell", calendar::start_of_cataclysm, item::default_charges_tag{}));
+            auto bat = item::spawn(
+                "heavy_battery_cell", calendar::start_of_cataclysm, item::default_charges_tag{});
+            bat->ammo_set( itype_id( "battery" ), bat->ammo_capacity() );
+            elec_pump.put_in(std::move(bat));
             you.i_add(std::move(tool));
 
             const int moves_before = you.get_moves();
