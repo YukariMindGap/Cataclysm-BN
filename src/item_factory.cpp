@@ -1153,8 +1153,8 @@ void Item_factory::init()
     // An empty dummy group, it will not spawn anything. However, it makes that item group
     // id valid, so it can be used all over the place without need to explicitly check for it.
     m_template_groups[item_group_id( "EMPTY_GROUP" )] = std::make_unique<Item_group>
-            ( Item_group::G_COLLECTION, 100, 0,
-              0 );
+        ( Item_group::G_COLLECTION, 100, 0,
+          0 );
 }
 
 bool Item_factory::check_ammo_type( std::string &msg, const ammotype &ammo ) const

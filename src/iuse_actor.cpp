@@ -1415,11 +1415,11 @@ void deploy_furn_actor::info( const item &, std::vector<iteminfo> &dump ) const
     }
     if( the_furn.has_flag( "BUTCHER_EQ" ) ) {
         can_function_as.emplace_back(
-            _( "a place to hang <info>corpses for butchering</info>" ) );
+                           _( "a place to hang <info>corpses for butchering</info>" ) );
     }
     if( the_furn.has_flag( "FLAT_SURF" ) ) {
         can_function_as.emplace_back(
-            _( "a flat surface to <info>butcher</info> onto or <info>eat meals</info> from" ) );
+                           _( "a flat surface to <info>butcher</info> onto or <info>eat meals</info> from" ) );
     }
     if( the_furn.has_flag( "CAN_SIT" ) ) {
         can_function_as.emplace_back( _( "a place to <info>sit</info>" ) );
@@ -1926,7 +1926,7 @@ void inscribe_actor::load( const JsonObject &obj )
 
     if( !on_items && !on_terrain ) {
         obj.throw_error(
-            R"(Tried to create an useless inscribe_actor, at least on of "on_items" or "on_terrain" should be true)" );
+               R"(Tried to create an useless inscribe_actor, at least on of "on_items" or "on_terrain" should be true)" );
     }
 }
 
@@ -1980,16 +1980,16 @@ bool inscribe_actor::item_inscription( item &tool, item &cut ) const
     std::string messageprefix = ( hasnote ? _( "(To delete, clear the text and confirm)\n" ) : "" ) +
                                 //~ %1$s: gerund (e.g. carved), %2$s: item name
                                 string_format( pgettext( "carving", "%1$s on the %2$s is: " ),
-                                        gerund, cut.type_name() );
+                                    gerund, cut.type_name() );
 
     string_input_popup popup;
     popup.title( string_format( _( "%s what?" ), verb ) )
-    .width( 64 )
-    .text( hasnote ? cut.get_var( carving ) : std::string() )
-    .description( messageprefix )
-    .identifier( "inscribe_item" )
-    .max_length( 128 )
-    .query();
+         .width( 64 )
+         .text( hasnote ? cut.get_var( carving ) : std::string() )
+         .description( messageprefix )
+         .identifier( "inscribe_item" )
+         .max_length( 128 )
+         .query();
     if( popup.canceled() ) {
         return false;
     }
@@ -2745,7 +2745,7 @@ int learn_spell_actor::use( player &p, item &, bool, const tripoint_bub_ms & ) c
     }
     const bool knows_spell = p.magic->knows_spell( spells[action] );
     std::unique_ptr<player_activity> study_spell = std::make_unique<player_activity>( ACT_STUDY_SPELL,
-            p.magic->time_to_learn_spell( p, spells[action] ) );
+        p.magic->time_to_learn_spell( p, spells[action] ) );
     study_spell->str_values = {
         "", // reserved for "until you gain a spell level" option [0]
         "learn"
@@ -2816,7 +2816,7 @@ int cast_spell_actor::use( player &p, item &it, bool, const tripoint_bub_ms & ) 
     spell casting = spell( spell_id( item_spell ) );
 
     std::unique_ptr<player_activity> cast_spell = std::make_unique<player_activity>( ACT_SPELLCASTING,
-            casting.casting_time( p ) );
+        casting.casting_time( p ) );
     // [0] this is used as a spell level override for items casting spells
     cast_spell->values.emplace_back( spell_level );
     if( no_fail ) {
@@ -3157,8 +3157,7 @@ int bandolier_actor::use( player &p, item &it, bool, const tripoint_bub_ms & ) c
 
     actions.emplace_back( [&] {
 
-        it.contents.front().attempt_detach( [&p]( detached_ptr<item> &&it )
-        {
+        it.contents.front().attempt_detach( [&p]( detached_ptr<item> &&it ) {
             it = p.i_add_or_drop( std::move( it ) );
             if( it ) {
                 p.add_msg_if_player( _( "Never mind." ) );
@@ -4371,7 +4370,7 @@ int place_trap_actor::use( player &p, item &it, bool, const tripoint_bub_ms & ) 
         return 0;
     }
     const std::optional<tripoint_bub_ms> pos_ = choose_adjacent( string_format( _( "Place %s where?" ),
-            it.tname() ) );
+        it.tname() ) );
     if( !pos_ ) {
         return 0;
     }
@@ -4751,7 +4750,7 @@ int mutagen_actor::use( player &p, item &it, bool, const tripoint_bub_ms & ) con
         }
     }
     const mutation_category_trait &m_category = mutation_category_trait::get_category(
-                mutation_category );
+            mutation_category );
 
     if( p.has_trait( trait_MUT_JUNKIE ) ) {
         p.add_msg_if_player( m_good, _( "You quiver with anticipation…" ) );
@@ -4802,7 +4801,7 @@ int mutagen_iv_actor::use( player &p, item &it, bool, const tripoint_bub_ms & ) 
     }
 
     const mutation_category_trait &m_category = mutation_category_trait::get_category(
-                mutation_category );
+            mutation_category );
 
     if( p.has_trait( trait_MUT_JUNKIE ) ) {
         p.add_msg_if_player( m_category.junkie_message() );
@@ -4887,7 +4886,7 @@ int deploy_tent_actor::use( player &p, item &it, bool, const tripoint_bub_ms & )
         return 0;
     }
     const std::optional<tripoint_rel_ms> dir = choose_direction( string_format(
-                _( "Put up the %s where (%dx%d clear area)?" ), it.tname(), diam, diam ) );
+            _( "Put up the %s where (%dx%d clear area)?" ), it.tname(), diam, diam ) );
     if( !dir ) {
         return 0;
     }
@@ -5762,7 +5761,7 @@ int dna_editor_iuse::use( player &p, item &it, bool, const tripoint_bub_ms & ) c
         }
 
         const shared_ptr_fast<monster> newmon_ptr = make_shared_fast<monster>
-                ( mtype_id( chosen->name.str() ) );
+            ( mtype_id( chosen->name.str() ) );
         const monster &newmon = *newmon_ptr;
 
         p.use_charges( itype_mutagen, 1 );
@@ -7726,8 +7725,7 @@ auto iuse_paint_stuff_do_paint( player &who, item &it,
 
     const auto col_selector = [&]( const RGBColorPair oldColor ) -> std::optional<RGBColorPair> {
         const auto [p_fg, p_bg] = oldColor;
-        switch( layer )
-        {
+        switch( layer ) {
             default:
             case iuse_paint_stuff_config::both:
                 if( p_fg != target_color || p_bg != target_color ) {
@@ -8154,7 +8152,7 @@ auto iuse_paint_stuff_graffiti( player &who, item &, bool,
     string_input_popup popup;
     const std::string message = popup
                                 .description( string_format( "%s %s", _( "Spray What?" ),
-                                        _( "(To delete, clear the text and confirm)" ) ) )
+                                    _( "(To delete, clear the text and confirm)" ) ) )
                                 .text( m.has_graffiti_at( pos ) ? m.graffiti_at( pos ) : std::string() )
                                 .identifier( "graffiti" )
                                 .query_string();
