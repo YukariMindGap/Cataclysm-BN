@@ -1253,7 +1253,7 @@ static void marloss_common( player &p, item &it, const trait_id &current_color )
             p.rem_addiction( pr.second );
         }
         p.set_mutation(
-             trait_MARLOSS_AVOID ); // And if you survive it's etched in your RNA, so you're unlikely to repeat the experiment.
+            trait_MARLOSS_AVOID ); // And if you survive it's etched in your RNA, so you're unlikely to repeat the experiment.
     } else if( marloss_count >= 2 ) {
         p.add_msg_if_player( m_bad,
                              _( "You feel a familiar warmth, but suddenly it surges into painful burning as you convulse and collapse to the ground…" ) );
@@ -1450,8 +1450,8 @@ int iuse::petfood( player *p, item *it, bool, const tripoint_bub_ms & )
     }
 
     const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent( string_format(
-            _( "Tame which animal with the %s?" ),
-            it->tname() ) );
+                _( "Tame which animal with the %s?" ),
+                it->tname() ) );
     if( !pnt_ ) {
         return 0;
     }
@@ -1467,7 +1467,7 @@ int iuse::petfood( player *p, item *it, bool, const tripoint_bub_ms & )
                                       person.name );
                 if( person.is_ally( *p ) || x_in_y( 9, 10 ) ) {
                     person.say(
-                              _( "Okay, but please, don't give me this again.  I don't want to eat pet food in the cataclysm all day." ) );
+                        _( "Okay, but please, don't give me this again.  I don't want to eat pet food in the cataclysm all day." ) );
                     p->consume_charges( *it, 1 );
                     return 0;
                 } else {
@@ -1700,7 +1700,7 @@ int iuse::good_fishing_spot( const tripoint_bub_ms &pos )
     int fishable_locations = g->get_fishable_locations( 60, pos ).size();
     const oter_id &cur_omt =
         get_overmapbuffer( get_map().get_bound_dimension() ).ter( tripoint_abs_omt( project_to<coords::omt>(
-                bub_to_abs( pos ) ) ) );
+                    bub_to_abs( pos ) ) ) );
     std::string om_id = cur_omt.id().c_str();
     if( fishable_locations < 100 && !g->m.has_flag( "CURRENT", pos ) &&
         om_id.find( "river_" ) == std::string::npos && !cur_omt->is_lake() &&
@@ -1721,7 +1721,7 @@ int iuse::good_fishing_spot( const tripoint_bub_ms &pos )
         return 1;
     }
     g->u.add_msg_if_player(
-            m_info, _( "You doubt you will catch anything here, best look elsewhere" ) );
+        m_info, _( "You doubt you will catch anything here, best look elsewhere" ) );
     return 0;
 }
 
@@ -1875,7 +1875,7 @@ int iuse::fish_trap( player *p, item *it, bool t, const tripoint_bub_ms &pos )
             for( int i = 0; i < caught; i++ ) {
                 p->practice( skill_survival, rng( 4, 8 ) );
                 const std::vector<mtype_id> fish_group = MonsterGroupManager::GetMonstersFromGroup(
-                        GROUP_FISH );
+                            GROUP_FISH );
                 const mtype_id &fish_mon = random_entry_ref( fish_group );
                 g->m.add_item_or_charges( pos, item::make_corpse( fish_mon, it->birthday() + rng( 0_turns,
                                           3_hours ) ) );
@@ -2112,7 +2112,8 @@ int iuse::radio_on( player *p, item *it, bool t, const tripoint_bub_ms &pos )
             message = obscure_message( message, [&]()->int {
                 int signal_roll = dice( 10, tref.signal_strength * 3 );
                 int static_roll = dice( 10, 100 );
-                if( static_roll > signal_roll ) {
+                if( static_roll > signal_roll )
+                {
                     if( static_roll < signal_roll * 1.1 && one_in( 4 ) ) {
                         return 0;
                     } else {
@@ -2338,7 +2339,7 @@ int iuse::hammer( player *p, item *it, bool, const tripoint_bub_ms & )
     };
 
     const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent_highlight(
-            _( "Pry where?" ), _( "There is nothing to pry nearby." ), f, false );
+                _( "Pry where?" ), _( "There is nothing to pry nearby." ), f, false );
     if( !pnt_ ) {
         return 0;
     }
@@ -2383,8 +2384,8 @@ int iuse::crowbar( player *p, item *it, bool, const tripoint_bub_ms &pos )
     };
 
     const std::optional<tripoint_bub_ms> pnt_ = ( pos != p->bub_pos() ) ? pos :
-        choose_adjacent_highlight(
-            _( "Pry where?" ), _( "There is nothing to pry nearby." ), can_pry, false );
+            choose_adjacent_highlight(
+                _( "Pry where?" ), _( "There is nothing to pry nearby." ), can_pry, false );
     if( !pnt_ ) {
         return 0;
     }
@@ -2632,8 +2633,8 @@ int iuse::dig( player *p, item *it, bool t, const tripoint_bub_ms & )
     };
 
     const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent_highlight(
-            _( "Deposit excavated materials where?" ),
-            _( "There is nowhere to deposit the excavated materials." ), f, false );
+                _( "Deposit excavated materials where?" ),
+                _( "There is nowhere to deposit the excavated materials." ), f, false );
     if( !pnt_ ) {
         return 0;
     }
@@ -2668,7 +2669,7 @@ int iuse::dig( player *p, item *it, bool t, const tripoint_bub_ms & )
     }
 
     digging_moves_and_byproducts moves_and_byproducts = dig_pit_moves_and_byproducts( p, it, dig_point,
-        false );
+            false );
 
     const std::vector<npc *> helpers = character_funcs::get_crafting_helpers( *p, 3 );
     for( const npc *np : helpers ) {
@@ -2720,8 +2721,8 @@ int iuse::dig_channel( player *p, item *it, bool t, const tripoint_bub_ms & )
     };
 
     const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent_highlight(
-            _( "Deposit excavated materials where?" ),
-            _( "There is nowhere to deposit the excavated materials." ), f, false );
+                _( "Deposit excavated materials where?" ),
+                _( "There is nowhere to deposit the excavated materials." ), f, false );
     if( !pnt_ ) {
         return 0;
     }
@@ -2734,7 +2735,7 @@ int iuse::dig_channel( player *p, item *it, bool t, const tripoint_bub_ms & )
     }
 
     digging_moves_and_byproducts moves_and_byproducts = dig_pit_moves_and_byproducts( p, it, dig_point,
-        true );
+            true );
 
     const std::vector<npc *> helpers = character_funcs::get_crafting_helpers( *p, 3 );
     for( const npc *np : helpers ) {
@@ -2771,7 +2772,7 @@ int iuse::fill_pit( player *p, item *it, bool t, const tripoint_bub_ms & )
     };
 
     const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent_highlight(
-            _( "Fill which pit or mound?" ), _( "There is no pit or mound to fill nearby." ), f, false );
+                _( "Fill which pit or mound?" ), _( "There is no pit or mound to fill nearby." ), f, false );
     if( !pnt_ ) {
         return 0;
     }
@@ -2818,7 +2819,7 @@ int iuse::clear_rubble( player *p, item *it, bool, const tripoint_bub_ms & )
     };
 
     const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent_highlight(
-            _( "Clear rubble where?" ), _( "There is no rubble to clear nearby." ), f, false );
+                _( "Clear rubble where?" ), _( "There is no rubble to clear nearby." ), f, false );
     if( !pnt_ ) {
         return 0;
     }
@@ -3157,7 +3158,7 @@ int iuse::geiger( player *p, item *it, bool t, const tripoint_bub_ms &pos )
             };
 
             const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent_highlight( _( "Scan whom?" ),
-                _( "There is no one to scan nearby." ), f, false );
+                    _( "There is no one to scan nearby." ), f, false );
             if( !pnt_ ) {
                 return 0;
             }
@@ -3380,7 +3381,7 @@ int iuse::debug_grenade_act( player *p, item *it, bool t, const tripoint_bub_ms 
                     if( monster *const mon_ptr = g->critter_at<monster>( dest ) ) {
                         monster &critter = *mon_ptr;
                         critter.set_speed_base(
-                                   critter.get_speed_base() * rng_float( 1.1, 2.0 ) );
+                            critter.get_speed_base() * rng_float( 1.1, 2.0 ) );
                         critter.set_hp( critter.get_hp() * rng_float( 1.1, 2.0 ) );
                     } else if( npc *const person = g->critter_at<npc>( dest ) ) {
                         /** @EFFECT_STR_MAX increases possible str buff for NPCs */
@@ -3422,7 +3423,7 @@ int iuse::debug_grenade_act( player *p, item *it, bool t, const tripoint_bub_ms 
                     if( monster *const mon_ptr = g->critter_at<monster>( dest ) ) {
                         monster &critter = *mon_ptr;
                         critter.set_speed_base(
-                                   rng( 0, critter.get_speed_base() ) );
+                            rng( 0, critter.get_speed_base() ) );
                         critter.set_hp( rng( 1, critter.get_hp() ) );
                     } else if( npc *const person = g->critter_at<npc>( dest ) ) {
                         /** @EFFECT_STR_MAX increases possible str debuff for NPCs (NEGATIVE) */
@@ -4564,7 +4565,7 @@ int iuse::chop_tree( player *p, item *it, bool t, const tripoint_bub_ms & )
     };
 
     const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent_highlight(
-            _( "Chop down which tree?" ), _( "There is no tree to chop down nearby." ), f, false );
+                _( "Chop down which tree?" ), _( "There is no tree to chop down nearby." ), f, false );
     if( !pnt_ ) {
         return 0;
     }
@@ -4614,7 +4615,7 @@ int iuse::chop_logs( player *p, item *it, bool t, const tripoint_bub_ms & )
     };
 
     const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent_highlight(
-            _( "Chop which tree trunk?" ), _( "There is no tree trunk to chop nearby." ), f, false );
+                _( "Chop which tree trunk?" ), _( "There is no tree trunk to chop nearby." ), f, false );
     if( !pnt_ ) {
         return 0;
     }
@@ -4669,7 +4670,7 @@ int iuse::oxytorch( player *p, item *it, bool, const tripoint_bub_ms & )
     };
 
     const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent_highlight(
-            _( "Cut up metal where?" ), _( "There is no metal to cut up nearby." ), f, false );
+                _( "Cut up metal where?" ), _( "There is no metal to cut up nearby." ), f, false );
     if( !pnt_ ) {
         return 0;
     }
@@ -4724,7 +4725,7 @@ int iuse::hacksaw( player *p, item *it, bool t, const tripoint_bub_ms & )
     };
 
     const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent_highlight(
-            _( "Cut up metal where?" ), _( "There is no metal to cut up nearby." ), f, false );
+                _( "Cut up metal where?" ), _( "There is no metal to cut up nearby." ), f, false );
     if( !pnt_ ) {
         return 0;
     }
@@ -4767,7 +4768,7 @@ int iuse::boltcutters( player *p, item *it, bool, const tripoint_bub_ms & )
     };
 
     const std::optional<tripoint_bub_ms> pnt_ = choose_adjacent_highlight(
-            _( "Cut up metal where?" ), _( "There is no metal to cut up nearby." ), f, false );
+                _( "Cut up metal where?" ), _( "There is no metal to cut up nearby." ), f, false );
     if( !pnt_ ) {
         return 0;
     }
@@ -6937,8 +6938,8 @@ static extended_photo_def photo_def_for_camera_point( const tripoint_bub_ms &aim
             description_figures_appearance[ figure_name ] = figure_appearance;
 
             object_names_collection obj_collection = enumerate_objects_around_point( current, 1, aim_point, 2,
-                camera_pos, min_visible_volume, true,
-                ignored_points, vehicles_recorded );
+                    camera_pos, min_visible_volume, true,
+                    ignored_points, vehicles_recorded );
             std::string figure_text = pose + obj_collection.figure_text;
 
             if( !figure_effects.empty() ) {
@@ -7035,7 +7036,8 @@ static extended_photo_def photo_def_for_camera_point( const tripoint_bub_ms &aim
 
     auto num_of = []( const std::unordered_map<std::string, int> &m ) -> int {
         int ret = 0;
-        for( const auto &it : m ) {
+        for( const auto &it : m )
+        {
             ret += it.second;
         }
         return ret;
@@ -7073,7 +7075,7 @@ static extended_photo_def photo_def_for_camera_point( const tripoint_bub_ms &aim
     // TODO: fix point types
     const oter_id &cur_ter =
         get_overmapbuffer( get_map().get_bound_dimension() ).ter( tripoint_abs_omt( project_to<coords::omt>(
-                bub_to_abs( aim_point ) ) ) );
+                    bub_to_abs( aim_point ) ) ) );
     std::string overmap_desc = string_format( _( "In the background you can see a %s" ),
                                colorize( cur_ter->get_name(), cur_ter->get_color() ) );
     if( outside_tiles_num == total_tiles_num ) {
@@ -7878,7 +7880,8 @@ int iuse::radiocaron( player *p, item *it, bool t, const tripoint_bub_ms &pos )
 static void emit_radio_signal( player &p, const flag_id &signal )
 {
     const auto visitor = [&]( item & it, const tripoint_bub_ms & loc ) -> VisitResponse {
-        if( it.has_flag( flag_RADIO_ACTIVATION ) && it.has_flag( signal ) ) {
+        if( it.has_flag( flag_RADIO_ACTIVATION ) && it.has_flag( signal ) )
+        {
             sound_event se;
             se.origin = loc;
             se.volume = 50;
@@ -8882,7 +8885,7 @@ int iuse::capture_monster_act( player *p, item *it, bool, const tripoint_bub_ms 
         const std::string query = string_format( _( "Grab which creature to place in the %s?" ),
                                   it->tname() );
         const std::optional<tripoint_bub_ms> target_ = choose_adjacent_highlight( query,
-            _( "There is no creature nearby you can capture." ), adjacent_capturable, false );
+                _( "There is no creature nearby you can capture." ), adjacent_capturable, false );
         if( !target_ ) {
             p->add_msg_if_player( m_info, _( "You cannot use a %s there." ), it->tname() );
             return 0;
@@ -9173,8 +9176,8 @@ int iuse::report_grid_connections( player *p, item *, bool, const tripoint_bub_m
 {
     tripoint_abs_omt pos_abs = project_to<coords::omt>( tripoint_abs_ms( bub_to_abs( pos ) ) );
     std::vector<tripoint_rel_omt> connections = get_overmapbuffer(
-            p->get_dimension() ).electric_grid_connectivity_at(
-            pos_abs );
+                p->get_dimension() ).electric_grid_connectivity_at(
+                pos_abs );
 
     std::vector<std::string> connection_names;
     connection_names.reserve( connections.size() );
@@ -9243,8 +9246,8 @@ int iuse::modify_grid_connections( player *p, item *it, bool, const tripoint_bub
 {
     tripoint_abs_omt pos_abs = project_to<coords::omt>( tripoint_abs_ms( bub_to_abs( pos ) ) );
     std::vector<tripoint_rel_omt> connections = get_overmapbuffer(
-            p->get_dimension() ).electric_grid_connectivity_at(
-            pos_abs );
+                p->get_dimension() ).electric_grid_connectivity_at(
+                pos_abs );
 
     uilist ui;
 
@@ -9274,9 +9277,9 @@ int iuse::modify_grid_connections( player *p, item *it, bool, const tripoint_bub
         get_overmapbuffer( p->get_dimension() ).remove_grid_connection( pos_abs, destination_pos_abs );
     } else {
         std::set<tripoint_abs_omt> lhs_locations = get_overmapbuffer( p->get_dimension() ).electric_grid_at(
-                pos_abs );
+                    pos_abs );
         std::set<tripoint_abs_omt> rhs_locations = get_overmapbuffer( p->get_dimension() ).electric_grid_at(
-                destination_pos_abs );
+                    destination_pos_abs );
         int cost_mult;
         if( lhs_locations == rhs_locations ) {
             cost_mult = 0;

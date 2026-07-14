@@ -905,7 +905,7 @@ bool item::attempt_split( int qty,
     const bool split_from_preserving_container = goes_bad() && is_in_preserving_container();
     prepare_for_location_removal();
     const bool split_needs_rot_actualization = goes_bad() && is_loaded() && has_position() &&
-        !split_from_preserving_container;
+            !split_from_preserving_container;
     const auto split_pos = split_needs_rot_actualization ? bub_pos() : tripoint_bub_ms::zero();
     const auto vehicle_loc = dynamic_cast<vehicle_item_location *>( loc );
     const auto split_temperature = !split_needs_rot_actualization ? temperature_flag::TEMP_NORMAL :
@@ -1985,11 +1985,11 @@ void item::food_info( const item *food_item, std::vector<iteminfo> &info,
                      parts->test( iteminfo_parts::FOOD_VITAMINS );
     if( show_nutr && !food_item->has_flag( flag_NUTRIENT_OVERRIDE ) ) {
         info.emplace_back(
-                "FOOD", _( "Nutrition will <color_cyan>vary with available ingredients</color>." ) );
+            "FOOD", _( "Nutrition will <color_cyan>vary with available ingredients</color>." ) );
         if( recipe_dict.is_item_on_loop( food_item->typeId() ) ) {
             info.emplace_back(
-                    "FOOD", _( "Nutrition range cannot be calculated accurately due to "
-                               "<color_red>recipe loops</color>." ) );
+                "FOOD", _( "Nutrition range cannot be calculated accurately due to "
+                           "<color_red>recipe loops</color>." ) );
         }
     }
 
@@ -2322,13 +2322,13 @@ void item::ammo_info( std::vector<iteminfo> &info, const iteminfo_query *parts, 
     if( ammo.ammo_effects.contains( ammo_effect_RECYCLED ) &&
         parts->test( iteminfo_parts::AMMO_FX_RECYCLED ) ) {
         fx.emplace_back(
-              _( "This ammo has been <info>hand-loaded</info> and has a <bad>small chance to misfire</bad>." ) );
+            _( "This ammo has been <info>hand-loaded</info> and has a <bad>small chance to misfire</bad>." ) );
     }
     if( ammo.ammo_effects.contains( ammo_effect_BLACKPOWDER ) &&
         parts->test( iteminfo_parts::AMMO_FX_BLACKPOWDER ) ) {
         fx.emplace_back(
-              _( "This ammo has been loaded with <bad>blackpowder</bad>, and will quickly "
-                 "clog up most guns, and cause rust if the gun is not cleaned." ) );
+            _( "This ammo has been loaded with <bad>blackpowder</bad>, and will quickly "
+               "clog up most guns, and cause rust if the gun is not cleaned." ) );
     }
     if( ammo.ammo_effects.contains( ammo_effect_NEVER_MISFIRES ) &&
         parts->test( iteminfo_parts::AMMO_FX_CANTMISSFIRE ) ) {
@@ -4448,7 +4448,7 @@ void item::final_info( std::vector<iteminfo> &info, const iteminfo_query &parts_
         const inventory &crafting_inv = you.crafting_inventory();
 
         const recipe_subset available_recipe_subset = you.get_available_recipes( crafting_inv, nullptr,
-            recipe_filter_by_component( tid ) );
+                recipe_filter_by_component( tid ) );
         const std::set<const recipe *> &item_recipes = available_recipe_subset.of_component( tid );
 
         if( item_recipes.empty() ) {
@@ -5817,7 +5817,7 @@ units::volume item::volume( bool integral ) const
 
     if( count_by_charges() || made_of( LIQUID ) ) {
         units::quantity<int64_t, units::volume_in_milliliter_tag> num = ret * static_cast<int64_t>
-            ( charges );
+                ( charges );
         if( type->stack_size <= 0 ) {
             debugmsg( "Item type %s has invalid stack_size %d", typeId().str(), type->stack_size );
             ret = num;
@@ -6544,7 +6544,8 @@ namespace
  * Original formula:
  * @see https://github.com/cataclysmbn/Cataclysm-BN/blob/033901af4b52ad0bfcfd6abfe06bca4e403d44b1/src/item.cpp#L5612-L5640
  */
-constexpr auto rot_chart = std::array<int, 44> {
+constexpr auto rot_chart = std::array<int, 44>
+{
     0, 372, 744, 1118, 1219, 1273, 1388, 1514, 1651, 1800,
     1880, 2050, 2235, 2438, 2658, 2776, 3027, 3301, 3600, 3926,
     4100, 4471, 4875, 5317, 5798, 6054, 6602, 7200, 7852, 8562,
@@ -10243,9 +10244,11 @@ std::string item::components_to_string() const
     }
     return enumerate_as_string( counts.begin(), counts.end(),
     []( const std::pair<std::string, int> &entry ) -> std::string {
-        if( entry.second != 1 ) {
+        if( entry.second != 1 )
+        {
             return string_format( pgettext( "components count", "%d x %s" ), entry.second, entry.first );
-        } else {
+        } else
+        {
             return entry.first;
         }
     }, enumeration_conjunction::none );
@@ -11156,7 +11159,8 @@ detached_ptr<item> item::process( detached_ptr<item> &&self, player *carrier,
 
     auto process_content = [&]( auto &&process_content, detached_ptr<item> &&it,
     const content_processing_options & opts ) -> detached_ptr<item> {
-        if( !it ) {
+        if( !it )
+        {
             return std::move( it );
         }
 
@@ -11721,7 +11725,7 @@ std::vector<item_comp> item::get_uncraft_components() const
     if( components.empty() ) {
         //If item wasn't crafted with specific components use default recipe
         std::vector<std::vector<item_comp>> recipe = recipe_dictionary::get_uncraft(
-                typeId() ).disassembly_requirements().get_components();
+                                             typeId() ).disassembly_requirements().get_components();
         for( std::vector<item_comp> &component : recipe ) {
             ret.push_back( component.front() );
         }
