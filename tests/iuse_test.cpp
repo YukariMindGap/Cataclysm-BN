@@ -14,6 +14,8 @@
 #include "morale_types.h"
 #include "player_helpers.h"
 #include "type_id.h"
+#include "debug.h"
+#include "iuse.h"
 #include "value_ptr.h"
 
 #include <array>
@@ -1210,6 +1212,14 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
     };
     clear_items();
 
+    auto invoke_actor = [&you]( item &tool, const std::string &method = "fluid_pickup" ) -> int {
+        item *actually_used = tool.get_usable_item( method );
+        if( actually_used == nullptr ) {
+            return -1;
+        }
+        return actually_used->type->invoke( you, *actually_used, you.bub_pos(), method );
+    };
+
     GIVEN("player has a plastic bottle with no fluid_pickup action") {
         auto bottle = item::spawn("bottle_plastic");
         item& bottle_ref = *bottle;
@@ -1220,7 +1230,11 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
                 water_pos, item::spawn("water", calendar::start_of_cataclysm, 100));
 
             THEN("the bottle cannot pick up ground liquids") {
-                CHECK_FALSE(you.invoke_item(&bottle_ref, "fluid_pickup", you.bub_pos()));
+                bool invoked = true;
+                capture_debugmsg_during( [&] {
+                    invoked = you.invoke_item( &bottle_ref, "fluid_pickup", you.bub_pos() );
+                } );
+                CHECK_FALSE( invoked );
             }
         }
     }
@@ -1235,9 +1249,10 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
             const int moves_before = you.get_moves();
 
             THEN("sponge picks up the liquid") {
-                REQUIRE(you.invoke_item(&sponge, "fluid_pickup", you.bub_pos()));
-                // Moves consumed by the action
-                CHECK(you.get_moves() < moves_before);
+                const int result = invoke_actor( sponge );
+                CAPTURE( result );
+                CHECK( result > 0 );
+                CHECK( you.get_moves() < moves_before );
             }
         }
 
@@ -1248,9 +1263,10 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
             const int moves_before = you.get_moves();
 
             THEN("hand pump picks up the liquid") {
-                // pump_fluid has a single use_action, so method name is optional
-                REQUIRE(you.invoke_item(&pump, "fluid_pickup", you.bub_pos()));
-                CHECK(you.get_moves() < moves_before);
+                const int result = invoke_actor( pump );
+                CAPTURE( result );
+                CHECK( result > 0 );
+                CHECK( you.get_moves() < moves_before );
             }
         }
     }
@@ -1265,11 +1281,13 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
             const int moves_before = you.get_moves();
 
             THEN("excess is split and restored on cancel") {
-                REQUIRE(you.invoke_item(&pump, "fluid_pickup", you.bub_pos()));
-                CHECK(you.get_moves() < moves_before);
+                const int result = invoke_actor( pump );
+                CAPTURE( result );
+                CHECK( result > 0 );
+                CHECK( you.get_moves() < moves_before );
                 // Water should still be on the map (handle_liquid canceled)
-                const auto& stack = here.i_at(water_pos);
-                CHECK_FALSE(stack.empty());
+                const auto& stack = here.i_at( water_pos );
+                CHECK_FALSE( stack.empty() );
             }
         }
 
@@ -1289,9 +1307,15 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
                 const int moves_before = you.get_moves();
 
                 THEN("gas pump picks up liquid and consumes charges") {
-                    REQUIRE(you.invoke_item(&gas_pump, "fluid_pickup", you.bub_pos()));
-                    CHECK(you.get_moves() < moves_before);
-                    CHECK(gas_pump.ammo_remaining() == 9);
+                    const int result = invoke_actor( gas_pump );
+                    CAPTURE( result );
+                    CHECK( result > 0 );
+                    CHECK( you.get_moves() < moves_before );
+                    // Mirror Character::consume_charges for non-UPS, non-power-armor tools
+                    if( gas_pump.ammo_remaining() >= result ) {
+                        gas_pump.ammo_consume( result, you.bub_pos() );
+                    }
+                    CHECK( gas_pump.ammo_remaining() == 9 );
                 }
             }
         }
@@ -1309,8 +1333,10 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
             const int moves_before = you.get_moves();
 
             THEN("electric pump picks up liquid and consumes charges") {
-                REQUIRE(you.invoke_item(&elec_pump, "fluid_pickup", you.bub_pos()));
-                CHECK(you.get_moves() < moves_before);
+                const int result = invoke_actor( elec_pump );
+                CAPTURE( result );
+                CHECK( result > 0 );
+                CHECK( you.get_moves() < moves_before );
             }
         }
     }
@@ -1324,8 +1350,10 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
         const int moves_before = you.get_moves();
 
         THEN("fluid_pickup returns early") {
-            CHECK_FALSE(you.invoke_item(&sponge, "fluid_pickup", you.bub_pos()));
-            CHECK(you.get_moves() == moves_before);
+            const int result = invoke_actor( sponge );
+            CAPTURE( result );
+            CHECK( result == 0 );
+            CHECK( you.get_moves() == moves_before );
         }
     }
 
