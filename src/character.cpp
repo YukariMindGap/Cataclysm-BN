@@ -8306,7 +8306,6 @@ bool Character::invoke_item( item *used, const std::string &method, const tripoi
     if( charges_used == 0 ) {
         return false;
     }
-
     // Prevent accessing the item as it may have been deleted by the invoked iuse function.
 
     if( used->is_tool() || used->is_medication() || used->get_contained().is_medication() ) {
@@ -8322,7 +8321,7 @@ bool Character::invoke_item( item *used, const std::string &method, const tripoi
         return true;
     }
 
-    return true;
+    return false;
 }
 
 detached_ptr<item> Character::dispose_item( detached_ptr<item> &&obj, const std::string &prompt )
