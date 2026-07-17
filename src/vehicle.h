@@ -926,7 +926,8 @@ class vehicle
         std::map<itype_id, int> fuels_left() const;
 
         // Checks how much certain fuel left in tanks.
-        int fuel_left( const itype_id &ftype, bool recurse = false ) const;
+        int fuel_left( const itype_id &ftype, bool recurse = false,
+                       bool exclude_dirty = false ) const;
         // Checks how much of the part p's current fuel is left
         int fuel_left( int p, bool recurse = false ) const;
         // Checks how much of an engine's current fuel is left in the tanks.

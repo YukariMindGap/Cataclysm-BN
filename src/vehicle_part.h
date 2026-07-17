@@ -119,6 +119,9 @@ struct vehicle_part {
         /* @retun true if part in current state be reloaded optionally with specific itype_id */
         bool can_reload( const item *obj = nullptr ) const;
 
+        /** Whether the fuel currently stored in this part is clean (not DIRTY) */
+        bool fuel_is_clean() const;
+
         /**
          * If this part is capable of wholly containing something, process the
          * items in there.

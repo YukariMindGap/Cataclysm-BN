@@ -1123,8 +1123,21 @@ bool vehicle::start_engine( const int e )
                 return false;
             }
         } else {
-            add_msg( _( "Looks like the %1$s is out of %2$s." ), eng.name(),
-                     item::nname( einfo.fuel_type ) );
+            // Check if fuel exists but is all dirty
+            bool has_dirty_fuel = false;
+            for( const itype_id &fid : einfo.engine_fuel_opts() ) {
+                if( fuel_left( fid, false, false ) > 0 && fuel_left( fid, false, true ) == 0 ) {
+                    has_dirty_fuel = true;
+                    break;
+                }
+            }
+            if( has_dirty_fuel ) {
+                add_msg( _( "The fuel in the %s's tank is dirty and cannot be used by the engine." ),
+                         eng.name() );
+            } else {
+                add_msg( _( "Looks like the %1$s is out of %2$s." ), eng.name(),
+                         item::nname( einfo.fuel_type ) );
+            }
             return false;
         }
     }
