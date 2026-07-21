@@ -8717,7 +8717,8 @@ void fluid_filter_actor::info( const item &, std::vector<iteminfo> &info ) const
 {
     info.emplace_back( "TOOL", _( "Moves: " ) + std::to_string( moves ) );
     if( retention_rate < 1.0f ) {
-        info.emplace_back( "TOOL", _( "Retention: " ) + std::to_string( static_cast<int>( retention_rate * 100 ) ) + "%" );
+        info.emplace_back( "TOOL", _( "Retention: " ) + std::to_string( static_cast<int>
+                           ( retention_rate * 100 ) ) + "%" );
     }
     if( charges_to_use > 0 ) {
         info.emplace_back( "TOOL", _( "Charges per use: " ) + std::to_string( charges_to_use ) );

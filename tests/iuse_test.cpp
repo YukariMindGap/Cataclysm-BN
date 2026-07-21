@@ -1450,8 +1450,7 @@ TEST_CASE("fluid_filter", "[iuse][fluid_filter]") {
 
     GIVEN("player has a large dirty liquid and a filter with 50% retention") {
         auto bottled = item::in_container(
-            itype_id("bottle_plastic"),
-            item::spawn("water", calendar::start_of_cataclysm, 100));
+            itype_id("bottle_plastic"), item::spawn("water", calendar::start_of_cataclysm, 100));
         item& bottled_ref = *bottled;
         bottled_ref.contents.front().set_flag(flag_DIRTY);
         CHECK(bottled_ref.contents.front().charges == 100);
@@ -1461,7 +1460,8 @@ TEST_CASE("fluid_filter", "[iuse][fluid_filter]") {
             // Simulate the actor's logic directly (inv_map_splice no-ops in test_mode)
             item* found = nullptr;
             for (item* candidate : you.inv_dump()) {
-                if (!candidate->contents.empty() && candidate->contents.front().has_own_flag(flag_DIRTY)) {
+                if (!candidate->contents.empty()
+                    && candidate->contents.front().has_own_flag(flag_DIRTY)) {
                     found = candidate;
                     break;
                 }
