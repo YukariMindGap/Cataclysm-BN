@@ -1401,8 +1401,7 @@ TEST_CASE("fluid_filter", "[iuse][fluid_filter]") {
     GIVEN("player has no dirty liquids in inventory") {
         // Clean water in a bottle — no DIRTY flag, won't match predicate
         auto bottled = item::in_container(
-            itype_id("bottle_plastic"),
-            item::spawn("water", calendar::start_of_cataclysm, 1));
+            itype_id("bottle_plastic"), item::spawn("water", calendar::start_of_cataclysm, 1));
         item& bottled_ref = *bottled;
         you.i_add(std::move(bottled));
 
@@ -1418,8 +1417,7 @@ TEST_CASE("fluid_filter", "[iuse][fluid_filter]") {
 
     GIVEN("player has a dirty liquid in inventory") {
         auto bottled = item::in_container(
-            itype_id("bottle_plastic"),
-            item::spawn("water", calendar::start_of_cataclysm, 1));
+            itype_id("bottle_plastic"), item::spawn("water", calendar::start_of_cataclysm, 1));
         item& bottled_ref = *bottled;
         // Mark the contained liquid as dirty
         bottled_ref.contents.front().set_flag(flag_DIRTY);
@@ -1437,7 +1435,8 @@ TEST_CASE("fluid_filter", "[iuse][fluid_filter]") {
             // 1. Find the container in inventory
             // 2. Simulate what the actor does
             for (item* candidate : you.inv_dump()) {
-                if (!candidate->contents.empty() && candidate->contents.front().has_own_flag(flag_DIRTY)) {
+                if (!candidate->contents.empty()
+                    && candidate->contents.front().has_own_flag(flag_DIRTY)) {
                     item& liq = candidate->contents.front();
                     liq.unset_flag(flag_DIRTY);
                     CHECK_FALSE(liq.has_own_flag(flag_DIRTY));

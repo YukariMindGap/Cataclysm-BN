@@ -8678,7 +8678,7 @@ int fluid_filter_actor::use( player &p, item &/*it*/, bool, const tripoint_bub_m
         return 0;
     }
 
-    auto obj = g->inv_map_splice( []( const item &e ) {
+    auto obj = g->inv_map_splice( []( const item & e ) {
         return !e.contents.empty() && e.contents.front().has_own_flag( flag_DIRTY );
     }, _( "Filter which liquid?" ), 1, _( "You don't have any dirty liquids to filter." ) );
 
