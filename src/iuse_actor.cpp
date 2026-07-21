@@ -8665,6 +8665,7 @@ void fluid_filter_actor::load( const JsonObject &jo )
 {
     assign( jo, "moves", moves );
     assign( jo, "charges_to_use", charges_to_use );
+    assign( jo, "retention_rate", retention_rate );
 }
 
 int fluid_filter_actor::use( player &p, item &/*it*/, bool, const tripoint_bub_ms & ) const
@@ -8689,6 +8690,18 @@ int fluid_filter_actor::use( player &p, item &/*it*/, bool, const tripoint_bub_m
 
     item &liquid = obj->contents.front();
     liquid.unset_flag( flag_DIRTY );
+
+    // Apply retention loss: discard (1 - retention_rate) of charges
+    if( retention_rate < 1.0f && liquid.charges > 1 ) {
+        const int keep = std::max( 1, static_cast<int>( liquid.charges * retention_rate ) );
+        const int discard = liquid.charges - keep;
+        if( discard > 0 ) {
+            detached_ptr<item> waste = liquid.split( discard );
+            p.add_msg_if_player( m_info, _( "You discard some of the %s as waste." ),
+                                 liquid.tname() );
+        }
+    }
+
     p.add_msg_if_player( m_good, _( "You filter the %s clean." ), liquid.tname() );
 
     p.mod_moves( -moves );
@@ -8703,6 +8716,9 @@ auto fluid_filter_actor::clone() const -> std::unique_ptr<iuse_actor>
 void fluid_filter_actor::info( const item &, std::vector<iteminfo> &info ) const
 {
     info.emplace_back( "TOOL", _( "Moves: " ) + std::to_string( moves ) );
+    if( retention_rate < 1.0f ) {
+        info.emplace_back( "TOOL", _( "Retention: " ) + std::to_string( static_cast<int>( retention_rate * 100 ) ) + "%" );
+    }
     if( charges_to_use > 0 ) {
         info.emplace_back( "TOOL", _( "Charges per use: " ) + std::to_string( charges_to_use ) );
     }

@@ -1695,6 +1695,7 @@ class fluid_filter_actor : public iuse_actor
     public:
         int moves = 100;
         int charges_to_use = 0;
+        float retention_rate = 0.5f;
 
         fluid_filter_actor( const std::string &type = "fluid_filter" ) : iuse_actor( type ) {}
         ~fluid_filter_actor() override = default;

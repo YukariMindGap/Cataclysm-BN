@@ -80,7 +80,7 @@
     "volume": "500 ml",
     "price": "19 USD",
     "price_postapoc": "250 cent",
-    "use_action": { "type": "fluid_filter", "moves": 100 }
+    "use_action": { "type": "fluid_filter", "moves": 100, "retention_rate": 0.5 }
   },
   {
     "id": "filter_liquid_makeshift",
@@ -93,7 +93,7 @@
     "volume": "750 ml",
     "price": "2 USD",
     "price_postapoc": "50 cent",
-    "use_action": { "type": "fluid_filter", "moves": 200 }
+    "use_action": { "type": "fluid_filter", "moves": 200, "retention_rate": 0.3 }
   },
   {
     "id": "glowplug",

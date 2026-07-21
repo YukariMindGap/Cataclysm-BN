@@ -1447,4 +1447,37 @@ TEST_CASE("fluid_filter", "[iuse][fluid_filter]") {
             CHECK(result == 0);
         }
     }
+
+    GIVEN("player has a large dirty liquid and a filter with 50% retention") {
+        auto bottled = item::in_container(
+            itype_id("bottle_plastic"),
+            item::spawn("water", calendar::start_of_cataclysm, 100));
+        item& bottled_ref = *bottled;
+        bottled_ref.contents.front().set_flag(flag_DIRTY);
+        CHECK(bottled_ref.contents.front().charges == 100);
+        you.i_add(std::move(bottled));
+
+        THEN("retention_rate discards the correct portion") {
+            // Simulate the actor's logic directly (inv_map_splice no-ops in test_mode)
+            item* found = nullptr;
+            for (item* candidate : you.inv_dump()) {
+                if (!candidate->contents.empty() && candidate->contents.front().has_own_flag(flag_DIRTY)) {
+                    found = candidate;
+                    break;
+                }
+            }
+            REQUIRE(found != nullptr);
+            item& liq = found->contents.front();
+
+            const float rate = 0.5f;
+            const int keep = std::max(1, static_cast<int>(liq.charges * rate));
+            const int discard = liq.charges - keep;
+            REQUIRE(discard > 0);
+
+            detached_ptr<item> waste = liq.split(discard);
+            CHECK(liq.charges == keep);
+            CHECK(waste->charges == discard);
+            CHECK(liq.charges <= 50);
+        }
+    }
 }

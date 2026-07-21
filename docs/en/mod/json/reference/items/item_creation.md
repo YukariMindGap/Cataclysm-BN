@@ -1165,7 +1165,8 @@ more structured function.
 "use_action": {
     "type": "fluid_filter",     // Filter dirty liquid in a container, removing the DIRTY flag
     "moves": 100,               // Move cost for the action (default: 100)
-    "charges_to_use": 0         // Optional, charges consumed from the tool per use (default: 0)
+    "charges_to_use": 0,        // Optional, charges consumed from the tool per use (default: 0)
+    "retention_rate": 0.5       // Optional, fraction of liquid retained after filtering (default: 0.5)
 }
 ```
 
