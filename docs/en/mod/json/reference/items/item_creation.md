@@ -1161,6 +1161,11 @@ more structured function.
     "max_volume": "1 L",        // Maximum volume of liquid that can be picked up per activation (default: 250 ml)
     "moves": 150,               // Move cost for the action (default: 100)
     "charges_to_use": 1         // Optional, charges consumed from the tool per use (default: 0)
+},
+"use_action": {
+    "type": "fluid_filter",     // Filter dirty liquid in a container, removing the DIRTY flag
+    "moves": 100,               // Move cost for the action (default: 100)
+    "charges_to_use": 0         // Optional, charges consumed from the tool per use (default: 0)
 }
 ```
 

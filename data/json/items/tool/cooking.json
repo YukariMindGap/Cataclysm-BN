@@ -153,7 +153,7 @@
     "initial_charges": 150,
     "max_charges": 150,
     "charges_per_use": 1,
-    "use_action": "WATER_PURIFIER",
+    "use_action": [ "WATER_PURIFIER", { "type": "fluid_filter", "moves": 100 } ],
     "flags": [ "ALLOWS_REMOTE_USE" ]
   },
   {

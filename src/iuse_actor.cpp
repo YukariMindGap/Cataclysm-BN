@@ -8660,3 +8660,50 @@ void fluid_pickup_actor::info( const item &, std::vector<iteminfo> &info ) const
         info.emplace_back( "TOOL", _( "Charges per use: " ) + std::to_string( charges_to_use ) );
     }
 }
+
+void fluid_filter_actor::load( const JsonObject &jo )
+{
+    assign( jo, "moves", moves );
+    assign( jo, "charges_to_use", charges_to_use );
+}
+
+int fluid_filter_actor::use( player &p, item &/*it*/, bool, const tripoint_bub_ms & ) const
+{
+    if( p.is_blind() ) {
+        p.add_msg_if_player( m_info, _( "You can't see what you're filtering!" ) );
+        return 0;
+    }
+    if( p.is_mounted() ) {
+        p.add_msg_if_player( m_info, _( "You cannot do that while mounted." ) );
+        return 0;
+    }
+
+    auto obj = g->inv_map_splice( []( const item &e ) {
+        return !e.contents.empty() && e.contents.front().has_own_flag( flag_DIRTY );
+    }, _( "Filter which liquid?" ), 1, _( "You don't have any dirty liquids to filter." ) );
+
+    if( !obj ) {
+        p.add_msg_if_player( m_info, _( "You do not have that item!" ) );
+        return 0;
+    }
+
+    item &liquid = obj->contents.front();
+    liquid.unset_flag( flag_DIRTY );
+    p.add_msg_if_player( m_good, _( "You filter the %s clean." ), liquid.tname() );
+
+    p.mod_moves( -moves );
+    return charges_to_use > 0 ? charges_to_use : 1;
+}
+
+auto fluid_filter_actor::clone() const -> std::unique_ptr<iuse_actor>
+{
+    return std::make_unique<fluid_filter_actor>( *this );
+}
+
+void fluid_filter_actor::info( const item &, std::vector<iteminfo> &info ) const
+{
+    info.emplace_back( "TOOL", _( "Moves: " ) + std::to_string( moves ) );
+    if( charges_to_use > 0 ) {
+        info.emplace_back( "TOOL", _( "Charges per use: " ) + std::to_string( charges_to_use ) );
+    }
+}
