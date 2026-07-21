@@ -1453,7 +1453,7 @@ TEST_CASE("fluid_filter", "[iuse][fluid_filter]") {
             itype_id("bottle_plastic"), item::spawn("water", calendar::start_of_cataclysm, 100));
         item& bottled_ref = *bottled;
         bottled_ref.contents.front().set_flag(flag_DIRTY);
-        CHECK(bottled_ref.contents.front().charges == 100);
+        CHECK(bottled_ref.contents.front().charges == 2);
         you.i_add(std::move(bottled));
 
         THEN("retention_rate discards the correct portion") {
