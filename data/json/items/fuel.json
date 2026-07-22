@@ -301,7 +301,7 @@
     "name": { "str_sp": "dirty diesel" },
     "description": "Diesel fuel contaminated with ground debris.  It cannot be used as engine fuel.",
     "ammo_type": "dirty_diesel",
-    "fuel": { "energy": 0, "pump_terrain": "t_diesel_pump" }
+    "fuel": { "energy": 17.9 }
   },
   {
     "id": "dirty_gasoline",
@@ -310,7 +310,7 @@
     "name": { "str_sp": "dirty gasoline" },
     "description": "Gasoline contaminated with ground debris.  It cannot be used as engine fuel.",
     "ammo_type": "dirty_gasoline",
-    "fuel": { "energy": 0, "pump_terrain": "t_gas_pump" }
+    "fuel": { "energy": 17.1 }
   },
   {
     "id": "dirty_biodiesel",
@@ -319,7 +319,7 @@
     "name": { "str_sp": "dirty biodiesel" },
     "description": "Biodiesel contaminated with ground debris.  It cannot be used as engine fuel.",
     "ammo_type": "dirty_biodiesel",
-    "fuel": { "energy": 0 }
+    "fuel": { "energy": 14.8 }
   },
   {
     "id": "dirty_jp8",
@@ -328,7 +328,7 @@
     "name": { "str_sp": "dirty JP8 fuel" },
     "description": "JP8 fuel contaminated with ground debris.  It cannot be used as engine fuel.",
     "ammo_type": "dirty_jp8",
-    "fuel": { "energy": 0 }
+    "fuel": { "energy": 17.35 }
   },
   {
     "id": "dirty_avgas",
@@ -337,7 +337,7 @@
     "name": { "str_sp": "dirty avgas fuel" },
     "description": "Avgas fuel contaminated with ground debris.  It cannot be used as engine fuel.",
     "ammo_type": "dirty_avgas",
-    "fuel": { "energy": 0 }
+    "fuel": { "energy": 22.9 }
   },
   {
     "id": "dirty_lamp_oil",
@@ -346,6 +346,6 @@
     "name": { "str_sp": "dirty lamp oil" },
     "description": "Lamp oil contaminated with ground debris.  It cannot be used as fuel.",
     "ammo_type": "dirty_lamp_oil",
-    "fuel": { "energy": 0 }
+    "fuel": { "energy": 13.0 }
   }
 ]
