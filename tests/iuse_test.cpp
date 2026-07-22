@@ -1370,17 +1370,17 @@ TEST_CASE("fluid_reaction_ground_contamination", "[iuse][fluid_reaction]") {
     clear_map();
     clear_avatar();
 
-    auto &here = get_map();
-    auto &you = get_avatar();
-    g->place_player( tripoint_bub_ms( 60, 60, 0 ) );
+    auto& here = get_map();
+    auto& you = get_avatar();
+    g->place_player(tripoint_bub_ms(60, 60, 0));
 
     const auto ground_pos = you.bub_pos() + tripoint_east;
-    here.i_clear( ground_pos );
+    here.i_clear(ground_pos);
 
-    SECTION( "water_clean becomes water when dropped on bare ground" ) {
-        auto water = item::spawn( "water_clean", calendar::start_of_cataclysm, 1 );
-        CHECK( water->typeId() == itype_id( "water_clean" ) );
-        water->on_drop( ground_pos, here );
-        CHECK( water->typeId() == itype_id( "water" ) );
+    SECTION("water_clean becomes water when dropped on bare ground") {
+        auto water = item::spawn("water_clean", calendar::start_of_cataclysm, 1);
+        CHECK(water->typeId() == itype_id("water_clean"));
+        water->on_drop(ground_pos, here);
+        CHECK(water->typeId() == itype_id("water"));
     }
 }
