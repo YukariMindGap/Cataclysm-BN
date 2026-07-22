@@ -1355,6 +1355,33 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
         }
     }
 
+    GIVEN("dirty water is on an adjacent tile and player has a sponge") {
+        auto dirty_water = item::spawn("water", calendar::start_of_cataclysm, 4);
+        dirty_water->set_flag(flag_DIRTY);
+        here.add_item_or_charges(water_pos, std::move(dirty_water));
+
+        auto tool = item::spawn("sponge");
+        item& sponge = *tool;
+        you.i_add(std::move(tool));
+
+        THEN("sponge retains some and does not remove DIRTY flag") {
+            const int result = invoke_actor(sponge);
+            CAPTURE(result);
+            CHECK(result > 0);
+
+            // Map water should still exist with DIRTY flag
+            const auto& stack = here.i_at(water_pos);
+            bool dirty_found = false;
+            for( const item *i : stack ) {
+                if( i->made_of( LIQUID ) && i->has_own_flag( flag_DIRTY ) ) {
+                    dirty_found = true;
+                    break;
+                }
+            }
+            CHECK( dirty_found );
+        }
+    }
+
     GIVEN("a reference bottled water created via in_container") {
         auto bottled = item::in_container(
             itype_id("bottle_plastic"), item::spawn("water", calendar::start_of_cataclysm, 1));
@@ -1366,118 +1393,3 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
     }
 }
 
-TEST_CASE("fluid_filter", "[iuse][fluid_filter]") {
-    const auto restore_turn = restore_on_out_of_scope<time_point>(calendar::turn);
-    clear_map();
-    clear_avatar();
-
-    auto& you = get_avatar();
-    auto& here = get_map();
-    g->place_player(tripoint_bub_ms(60, 60, 0));
-    set_time(calendar::turn_zero + 12_hours);
-    you.recalc_sight_limits();
-
-    auto invoke_filter = [&you](item& tool) -> int {
-        item* actually_used = tool.get_usable_item("fluid_filter");
-        if (actually_used == nullptr) { return -1; }
-        return actually_used->type->invoke(you, *actually_used, you.bub_pos(), "fluid_filter");
-    };
-
-    GIVEN("player is blind") {
-        you.add_effect(efftype_id("blind"), 1_hours);
-        auto tool = item::spawn("filter_liquid");
-        item& filter = *tool;
-        you.i_add(std::move(tool));
-        const int moves_before = you.get_moves();
-
-        THEN("fluid_filter returns early") {
-            const int result = invoke_filter(filter);
-            CAPTURE(result);
-            CHECK(result == 0);
-            CHECK(you.get_moves() == moves_before);
-        }
-    }
-
-    GIVEN("player has no dirty liquids in inventory") {
-        // Clean water in a bottle — no DIRTY flag, won't match predicate
-        auto bottled = item::in_container(
-            itype_id("bottle_plastic"), item::spawn("water", calendar::start_of_cataclysm, 1));
-        item& bottled_ref = *bottled;
-        you.i_add(std::move(bottled));
-
-        auto tool = item::spawn("filter_liquid_makeshift");
-        item& filter = *tool;
-        you.i_add(std::move(tool));
-
-        THEN("fluid_filter returns 0 for no matching items") {
-            const int result = invoke_filter(filter);
-            CHECK(result == 0);
-        }
-    }
-
-    GIVEN("player has a dirty liquid in inventory") {
-        auto bottled = item::in_container(
-            itype_id("bottle_plastic"), item::spawn("water", calendar::start_of_cataclysm, 1));
-        item& bottled_ref = *bottled;
-        // Mark the contained liquid as dirty
-        bottled_ref.contents.front().set_flag(flag_DIRTY);
-        CHECK(bottled_ref.contents.front().has_own_flag(flag_DIRTY));
-        you.i_add(std::move(bottled));
-
-        auto tool = item::spawn("filter_liquid");
-        item& filter = *tool;
-        you.i_add(std::move(tool));
-
-        THEN("fluid_filter removes the DIRTY flag") {
-            // In test_mode inv_map_splice returns nullptr, so the
-            // iuse call returns 0 early.  We test the flag removal
-            // logic directly here:
-            // 1. Find the container in inventory
-            // 2. Simulate what the actor does
-            for (item* candidate : you.inv_dump()) {
-                if (!candidate->contents.empty()
-                    && candidate->contents.front().has_own_flag(flag_DIRTY)) {
-                    item& liq = candidate->contents.front();
-                    liq.unset_flag(flag_DIRTY);
-                    CHECK_FALSE(liq.has_own_flag(flag_DIRTY));
-                }
-            }
-            // Also verify via the iuse function it returns safely
-            const int result = invoke_filter(filter);
-            CHECK(result == 0);
-        }
-    }
-
-    GIVEN("player has a large dirty liquid and a filter with 50% retention") {
-        auto bottled = item::in_container(
-            itype_id("bottle_plastic"), item::spawn("water", calendar::start_of_cataclysm, 100));
-        item& bottled_ref = *bottled;
-        bottled_ref.contents.front().set_flag(flag_DIRTY);
-        CHECK(bottled_ref.contents.front().charges == 2);
-        you.i_add(std::move(bottled));
-
-        THEN("retention_rate discards the correct portion") {
-            // Simulate the actor's logic directly (inv_map_splice no-ops in test_mode)
-            item* found = nullptr;
-            for (item* candidate : you.inv_dump()) {
-                if (!candidate->contents.empty()
-                    && candidate->contents.front().has_own_flag(flag_DIRTY)) {
-                    found = candidate;
-                    break;
-                }
-            }
-            REQUIRE(found != nullptr);
-            item& liq = found->contents.front();
-
-            const float rate = 0.5f;
-            const int keep = std::max(1, static_cast<int>(liq.charges * rate));
-            const int discard = liq.charges - keep;
-            REQUIRE(discard > 0);
-
-            detached_ptr<item> waste = liq.split(discard);
-            CHECK(liq.charges == keep);
-            CHECK(waste->charges == discard);
-            CHECK(liq.charges <= 50);
-        }
-    }
-}

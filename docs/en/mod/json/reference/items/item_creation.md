@@ -1160,14 +1160,9 @@ more structured function.
     "type": "fluid_pickup",     // Pick up liquids from the ground or vehicle cargo
     "max_volume": "1 L",        // Maximum volume of liquid that can be picked up per activation (default: 250 ml)
     "moves": 150,               // Move cost for the action (default: 100)
-    "charges_to_use": 1         // Optional, charges consumed from the tool per use (default: 0)
+    "charges_to_use": 1,        // Optional, charges consumed from the tool per use (default: 0)
+    "retention_rate": 0.8       // Optional, fraction of liquid retained after pickup (default: 1.0, discarded is destroyed)
 },
-"use_action": {
-    "type": "fluid_filter",     // Filter dirty liquid in a container, removing the DIRTY flag
-    "moves": 100,               // Move cost for the action (default: 100)
-    "charges_to_use": 0,        // Optional, charges consumed from the tool per use (default: 0)
-    "retention_rate": 0.5       // Optional, fraction of liquid retained after filtering (default: 0.5)
-}
 ```
 
 ### Random Descriptions

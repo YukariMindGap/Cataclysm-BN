@@ -931,11 +931,6 @@
   },
   {
     "type": "item_action",
-    "id": "fluid_filter",
-    "name": { "str": "Filter liquid" }
-  },
-  {
-    "type": "item_action",
     "id": "explosion",
     "name": { "str": "Activate" }
   },

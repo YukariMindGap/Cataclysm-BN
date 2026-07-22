@@ -326,7 +326,7 @@
     "material": [ "plastic", "iron" ],
     "symbol": ";",
     "color": "light_red",
-    "use_action": { "type": "fluid_pickup", "max_volume": "1 L", "moves": 150 }
+    "use_action": { "type": "fluid_pickup", "max_volume": "1 L", "moves": 150, "retention_rate": 0.8 }
   },
   {
     "id": "horn_bicycle",

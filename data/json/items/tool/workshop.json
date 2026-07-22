@@ -436,7 +436,7 @@
     "max_charges": 100,
     "initial_charges": 0,
     "charges_per_use": 1,
-    "use_action": { "type": "fluid_pickup", "max_volume": "5 L", "moves": 200, "charges_to_use": 1 }
+    "use_action": { "type": "fluid_pickup", "max_volume": "5 L", "moves": 200, "charges_to_use": 1, "retention_rate": 0.8 }
   },
   {
     "id": "pump_electric",
@@ -459,7 +459,7 @@
       [ "battery", [ "heavy_battery_cell", "heavy_plus_battery_cell", "heavy_atomic_battery_cell", "heavy_disposable_cell" ] ]
     ],
     "magazine_well": "1000 ml",
-    "use_action": { "type": "fluid_pickup", "max_volume": "5 L", "moves": 200, "charges_to_use": 1 }
+    "use_action": { "type": "fluid_pickup", "max_volume": "5 L", "moves": 200, "charges_to_use": 1, "retention_rate": 0.8 }
   },
   {
     "id": "plumber_toolkit",

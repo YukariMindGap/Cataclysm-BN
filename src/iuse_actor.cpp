@@ -8510,6 +8510,7 @@ void fluid_pickup_actor::load( const JsonObject &jo )
     assign( jo, "max_volume", max_volume );
     assign( jo, "moves", moves );
     assign( jo, "charges_to_use", charges_to_use );
+    assign( jo, "retention_rate", retention_rate );
 }
 
 int fluid_pickup_actor::use( player &p, item &it, bool, const tripoint_bub_ms & ) const
@@ -8592,6 +8593,17 @@ int fluid_pickup_actor::use( player &p, item &it, bool, const tripoint_bub_ms & 
         excess = target_item.split( target_item.charges - max_ch );
     }
 
+    // Apply retention loss: discard (1 - retention_rate) of charges
+    if( retention_rate < 1.0f && target_item.charges > 1 ) {
+        const int keep = std::max( 1, static_cast<int>( target_item.charges * retention_rate ) );
+        const int discard = target_item.charges - keep;
+        if( discard > 0 ) {
+            auto waste = target_item.split( discard );
+            p.add_msg_if_player( m_info, _( "You discard some of the %s as waste." ),
+                                 target_item.tname() );
+        }
+    }
+
     // Open the standard handle_liquid menu (item stays on map, cancel-safe)
     // In test mode, UI menus auto-cancel, so skip the call entirely
     if( !test_mode ) {
@@ -8656,66 +8668,6 @@ void fluid_pickup_actor::info( const item &, std::vector<iteminfo> &info ) const
 {
     info.emplace_back( "TOOL", _( "Max volume: " ) + format_volume( max_volume ) );
     info.emplace_back( "TOOL", _( "Moves: " ) + std::to_string( moves ) );
-    if( charges_to_use > 0 ) {
-        info.emplace_back( "TOOL", _( "Charges per use: " ) + std::to_string( charges_to_use ) );
-    }
-}
-
-void fluid_filter_actor::load( const JsonObject &jo )
-{
-    assign( jo, "moves", moves );
-    assign( jo, "charges_to_use", charges_to_use );
-    assign( jo, "retention_rate", retention_rate );
-}
-
-int fluid_filter_actor::use( player &p, item &/*it*/, bool, const tripoint_bub_ms & ) const
-{
-    if( p.is_blind() ) {
-        p.add_msg_if_player( m_info, _( "You can't see what you're filtering!" ) );
-        return 0;
-    }
-    if( p.is_mounted() ) {
-        p.add_msg_if_player( m_info, _( "You cannot do that while mounted." ) );
-        return 0;
-    }
-
-    auto obj = g->inv_map_splice( []( const item & e ) {
-        return !e.contents.empty() && e.contents.front().has_own_flag( flag_DIRTY );
-    }, _( "Filter which liquid?" ), 1, _( "You don't have any dirty liquids to filter." ) );
-
-    if( !obj ) {
-        p.add_msg_if_player( m_info, _( "You do not have that item!" ) );
-        return 0;
-    }
-
-    item &liquid = obj->contents.front();
-    liquid.unset_flag( flag_DIRTY );
-
-    // Apply retention loss: discard (1 - retention_rate) of charges
-    if( retention_rate < 1.0f && liquid.charges > 1 ) {
-        const int keep = std::max( 1, static_cast<int>( liquid.charges * retention_rate ) );
-        const int discard = liquid.charges - keep;
-        if( discard > 0 ) {
-            detached_ptr<item> waste = liquid.split( discard );
-            p.add_msg_if_player( m_info, _( "You discard some of the %s as waste." ),
-                                 liquid.tname() );
-        }
-    }
-
-    p.add_msg_if_player( m_good, _( "You filter the %s clean." ), liquid.tname() );
-
-    p.mod_moves( -moves );
-    return charges_to_use > 0 ? charges_to_use : 1;
-}
-
-auto fluid_filter_actor::clone() const -> std::unique_ptr<iuse_actor>
-{
-    return std::make_unique<fluid_filter_actor>( *this );
-}
-
-void fluid_filter_actor::info( const item &, std::vector<iteminfo> &info ) const
-{
-    info.emplace_back( "TOOL", _( "Moves: " ) + std::to_string( moves ) );
     if( retention_rate < 1.0f ) {
         info.emplace_back( "TOOL", _( "Retention: " ) + std::to_string( static_cast<int>
                            ( retention_rate * 100 ) ) + "%" );
@@ -8724,3 +8676,5 @@ void fluid_filter_actor::info( const item &, std::vector<iteminfo> &info ) const
         info.emplace_back( "TOOL", _( "Charges per use: " ) + std::to_string( charges_to_use ) );
     }
 }
+
+
