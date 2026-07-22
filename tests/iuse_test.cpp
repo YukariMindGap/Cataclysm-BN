@@ -1372,13 +1372,13 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
             // Map water should still exist with DIRTY flag
             const auto& stack = here.i_at(water_pos);
             bool dirty_found = false;
-            for( const item *i : stack ) {
-                if( i->made_of( LIQUID ) && i->has_own_flag( flag_DIRTY ) ) {
+            for (const item* i : stack) {
+                if (i->made_of(LIQUID) && i->has_own_flag(flag_DIRTY)) {
                     dirty_found = true;
                     break;
                 }
             }
-            CHECK( dirty_found );
+            CHECK(dirty_found);
         }
     }
 
@@ -1392,4 +1392,3 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
         }
     }
 }
-
