@@ -4082,8 +4082,7 @@ tripoint_rel_ms vehicle::pivot_displacement() const
     return rotate_to_world( pivot_rotation[0], pivot_anchor[1], pivot_anchor[0] );
 }
 
-int vehicle::fuel_left( const itype_id &ftype, bool recurse,
-                        bool exclude_dirty ) const
+int vehicle::fuel_left( const itype_id &ftype, bool recurse ) const
 {
     int fl = 0;
     if( ftype == fuel_type_battery ) {
@@ -4092,12 +4091,9 @@ int vehicle::fuel_left( const itype_id &ftype, bool recurse,
             return lhs + cpart( part_index ).ammo_remaining();
         } );
     } else {
-        fl = std::accumulate( parts.begin(), parts.end(), 0, [&ftype, exclude_dirty](
+        fl = std::accumulate( parts.begin(), parts.end(), 0, [&ftype](
         const int &lhs, const vehicle_part & rhs ) {
             if( rhs.ammo_current() != ftype ) {
-                return lhs;
-            }
-            if( exclude_dirty && !rhs.fuel_is_clean() ) {
                 return lhs;
             }
             return lhs + rhs.ammo_remaining();
@@ -4146,7 +4142,7 @@ int vehicle::fuel_left( const int p, bool recurse ) const
 int vehicle::engine_fuel_left( const int e, bool recurse ) const
 {
     if( static_cast<size_t>( e ) < engines.size() ) {
-        return fuel_left( parts[ engines[ e ] ].fuel_current(), recurse, true );
+        return fuel_left( parts[ engines[ e ] ].fuel_current(), recurse );
     }
     return 0;
 }

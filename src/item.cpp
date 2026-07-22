@@ -4706,8 +4706,6 @@ nc_color item::color_in_inventory( const player &p ) const
     } else if( is_armor() && p.has_trait( trait_WOOLALLERGY ) &&
                ( made_of( material_id( "wool" ) ) || has_own_flag( flag_wooled ) ) ) {
         ret = c_red;
-    } else if( has_own_flag( flag_DIRTY ) ) {
-        ret = c_brown;
     } else if( is_bionic() ) {
         if( ( !p.has_bionic( type->bionic->id ) &&
               !character_funcs::has_upgraded_bionic( p, type->bionic->id ) ) ||
@@ -5312,9 +5310,7 @@ std::string item::tname( unsigned int quantity, bool with_prefix, unsigned int t
     if( has_flag( flag_ETHEREAL_ITEM ) ) {
         tagtext += string_format( _( " (%s turns)" ), get_var( "ethereal" ) );
     } else if( goes_bad() || is_food() ) {
-        if( has_own_flag( flag_DIRTY ) ) {
-            tagtext += _( " (dirty)" );
-        } else if( rotten() ) {
+        if( rotten() ) {
             tagtext += _( " (rotten)" );
         } else if( is_going_bad() ) {
             tagtext += _( " (old)" );
@@ -11646,12 +11642,6 @@ bool item::on_drop( const tripoint_bub_ms &pos, map &m )
         }
     }
 
-    // dropping liquids, even currently frozen ones, on the ground makes them
-    // dirty
-    if( made_of( LIQUID ) && !m.has_flag( flag_LIQUIDCONT, pos ) &&
-        !has_own_flag( flag_DIRTY ) ) {
-        set_flag( flag_DIRTY );
-    }
     you.flag_encumbrance();
 
     return type->drop_action && type->drop_action.call( you, *this, false, pos );

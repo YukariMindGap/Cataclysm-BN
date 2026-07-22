@@ -444,7 +444,6 @@ void vehicle::print_fuel_indicator( const catacurses::window &win, point p,
     nc_color col_indf1 = c_light_gray;
     int cap = fuel_capacity( fuel_type );
     int f_left = fuel_left( fuel_type );
-    int f_clean = fuel_left( fuel_type, false, true );
     nc_color f_color = fuel_type->color;
     // NOLINTNEXTLINE(cata-text-style): not an ellipsis
     mvwprintz( win, p, col_indf1, "E...F" );
@@ -461,9 +460,6 @@ void vehicle::print_fuel_indicator( const catacurses::window &win, point p,
     }
     if( desc ) {
         wprintz( win, c_light_gray, " - %s", item::nname( fuel_type ) );
-        if( f_left > f_clean ) {
-            wprintz( win, c_red, " (%s)", _( "dirty" ) );
-        }
     }
     if( verbose ) {
         auto fuel_data = fuel_usages.find( fuel_type );

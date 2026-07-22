@@ -407,9 +407,6 @@ double vehicle_part::consume_energy( const itype_id &ftype, double energy_j )
 
     item &fuel = base->contents.back();
     if( fuel.typeId() == ftype ) {
-        if( fuel.has_flag( flag_DIRTY ) ) {
-            return 0.0;
-        }
         assert( fuel.is_fuel() );
         // convert energy density in MJ/L to J/ml
         const double energy_p_mL = fuel.fuel_energy() * 1000;
@@ -468,14 +465,6 @@ bool vehicle_part::can_reload( const item *obj ) const
     }
 
     return ammo_remaining() < ammo_capacity();
-}
-
-bool vehicle_part::fuel_is_clean() const
-{
-    if( !is_fuel_store() || base->contents.empty() ) {
-        return true;
-    }
-    return !base->contents.back().has_flag( flag_DIRTY );
 }
 
 void vehicle_part::process_contents( const tripoint_bub_ms &pos, const bool e_heater )

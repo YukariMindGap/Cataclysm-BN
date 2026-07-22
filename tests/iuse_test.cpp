@@ -1355,33 +1355,6 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
         }
     }
 
-    GIVEN("dirty water is on an adjacent tile and player has a sponge") {
-        auto dirty_water = item::spawn("water", calendar::start_of_cataclysm, 4);
-        dirty_water->set_flag(flag_DIRTY);
-        here.add_item_or_charges(water_pos, std::move(dirty_water));
-
-        auto tool = item::spawn("sponge");
-        item& sponge = *tool;
-        you.i_add(std::move(tool));
-
-        THEN("sponge retains some and does not remove DIRTY flag") {
-            const int result = invoke_actor(sponge);
-            CAPTURE(result);
-            CHECK(result > 0);
-
-            // Map water should still exist with DIRTY flag
-            const auto& stack = here.i_at(water_pos);
-            bool dirty_found = false;
-            for (const item* i : stack) {
-                if (i->made_of(LIQUID) && i->has_own_flag(flag_DIRTY)) {
-                    dirty_found = true;
-                    break;
-                }
-            }
-            CHECK(dirty_found);
-        }
-    }
-
     GIVEN("a reference bottled water created via in_container") {
         auto bottled = item::in_container(
             itype_id("bottle_plastic"), item::spawn("water", calendar::start_of_cataclysm, 1));
