@@ -2687,6 +2687,25 @@ void Item_factory::load_basic_info( const JsonObject &jo, itype &def, const std:
     assign( jo, "ascii_picture", def.picture_id );
     assign( jo, "item_vars", def.item_vars );
 
+    if( jo.has_member( "reacts_into" ) ) {
+        std::vector<fluid_reaction> reactions;
+        if( jo.has_array( "reacts_into" ) ) {
+            for( const JsonObject &r : jo.get_array( "reacts_into" ) ) {
+                reactions.push_back( {
+                    .result = itype_id( r.get_string( "result" ) ),
+                    .cause = r.get_string( "cause" ),
+                } );
+            }
+        } else {
+            const JsonObject r = jo.get_object( "reacts_into" );
+            reactions.push_back( {
+                .result = itype_id( r.get_string( "result" ) ),
+                .cause = r.get_string( "cause" ),
+            } );
+        }
+        def.reacts_into = reactions;
+    }
+
     if( jo.has_member( "thrown_damage" ) ) {
         def.thrown_damage = load_damage_instance( jo.get_array( "thrown_damage" ) );
     } else {

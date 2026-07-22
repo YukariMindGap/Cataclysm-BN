@@ -11642,6 +11642,15 @@ bool item::on_drop( const tripoint_bub_ms &pos, map &m )
         }
     }
 
+    if( made_of( LIQUID ) && !m.has_flag( flag_LIQUIDCONT, pos ) ) {
+        for( const fluid_reaction &r : type->reacts_into ) {
+            if( r.cause == "ground_contamination" ) {
+                convert( r.result );
+                break;
+            }
+        }
+    }
+
     you.flag_encumbrance();
 
     return type->drop_action && type->drop_action.call( you, *this, false, pos );
