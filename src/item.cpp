@@ -11642,6 +11642,13 @@ bool item::on_drop( const tripoint_bub_ms &pos, map &m )
         }
     }
 
+    // Prevent items with DESTROY_ON_DROP from being dropped onto the ground
+    if( has_flag( flag_DESTROY_ON_DROP ) && ( !made_of( LIQUID ) ||
+            !m.has_flag( flag_LIQUIDCONT, pos ) ) ) {
+        return true;
+    }
+
+    // Transform liquids with "ground contamination" reaction into other items
     if( made_of( LIQUID ) && !m.has_flag( flag_LIQUIDCONT, pos ) ) {
         for( const fluid_reaction &r : type->reacts_into ) {
             if( r.cause == "ground_contamination" ) {
