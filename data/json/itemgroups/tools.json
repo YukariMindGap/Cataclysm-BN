@@ -82,6 +82,7 @@
       [ "jumper_cable", 10 ],
       [ "hd_tow_cable", 5 ],
       [ "funnel", 50 ],
+      [ "fuel_filter_funnel", 20 ],
       [ "claw_bar", 2 ],
       [ "crowbar", 10 ],
       [ "thermometer", 5 ],
