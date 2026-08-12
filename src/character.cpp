@@ -132,6 +132,7 @@ static const activity_id ACT_TRY_SLEEP( "ACT_TRY_SLEEP" );
 static const activity_id ACT_WAIT_STAMINA( "ACT_WAIT_STAMINA" );
 
 static const bionic_id bio_eye_optic( "bio_eye_optic" );
+static const bionic_id bio_cqb( "bio_cqb" );
 
 static const matec_id WBLOCK_1( "WBLOCK_1" );
 static const matec_id WBLOCK_2( "WBLOCK_2" );
@@ -252,7 +253,6 @@ static const trait_id trait_ANTLERS( "ANTLERS" );
 static const trait_id trait_ASTHMA( "ASTHMA" );
 static const trait_id trait_BADBACK( "BADBACK" );
 static const trait_id trait_CF_HAIR( "CF_HAIR" );
-static const trait_id trait_GLASSJAW( "GLASSJAW" );
 static const trait_id trait_DEBUG_NODMG( "DEBUG_NODMG" );
 static const trait_id trait_DEBUG_STAMINA( "DEBUG_STAMINA" );
 static const trait_id trait_DEFT( "DEFT" );
@@ -389,6 +389,9 @@ static const enchantment_flag_id ench_flag_ALARMCLOCK( "ALARMCLOCK" );
 static const enchantment_flag_id ench_flag_WATCH( "WATCH" );
 static const enchantment_flag_id ench_flag_SLEEP_SIGHT( "SLEEP_SIGHT" );
 static const enchantment_flag_id ench_flag_INFRARED_VISION( "INFRARED_VISION" );
+static const enchantment_flag_id ench_flag_SONAR( "SONAR" );
+
+static const enchantment_value_id ench_val_GROUNDED_CREATURE_SIGHT( "GROUNDED_CREATURE_SIGHT" );
 
 namespace io
 {
@@ -1980,11 +1983,10 @@ void Character::calc_all_parts_hp( float hp_mod, float hp_adjustment, int str_ma
         float hp_ratio = static_cast<float>( bp.get_hp_cur() ) / bp.get_hp_max();
         int new_max = ( part.first->base_hp + str_max * 3 + hp_adjustment ) * hp_mod;
 
-        if( has_trait( trait_GLASSJAW ) && part.first == bodypart_str_id( "head" ) ) {
-            new_max *= 0.8;
+        const auto ench = enchantment_value_id( "HEALTH_POINTS_" + to_upper_case( part.first.str() ) );
+        if( ench.is_valid() ) {
+            new_max += bonus_from_enchantments( new_max, ench, true );
         }
-
-        new_max += bonus_from_enchantments( new_max, enchantment_value_id( "HEALTH_POINTS" ) );
         new_max = std::max( new_max, 1 );
         int new_cur = std::ceil( static_cast<float>( new_max ) * hp_ratio );
 
@@ -3374,7 +3376,7 @@ ret_val<bool> Character::can_wear( const item &it, bool with_equip_change ) cons
             return ret_val<bool>::make_failure(
                        _( "You can only wear power armor components with power armor!" ) );
         }
-        if( it.has_flag( flag_POWERARMOR_EXTERNAL ) ) {
+        if( it.has_flag( flag_POWERARMOR_EXTERNAL ) && !it.has_flag( flag_POWERARMOR_PLATING ) ) {
             for( auto &elem : worn ) {
                 if( elem->has_flag( flag_POWERARMOR_EXO ) &&
                     elem->get_covered_body_parts().make_intersection( it.get_covered_body_parts() ).any() ) {
@@ -3382,6 +3384,14 @@ ret_val<bool> Character::can_wear( const item &it, bool with_equip_change ) cons
                 } else if( elem->has_flag( flag_POWERARMOR_EXTERNAL ) &&
                            elem->get_covered_body_parts().make_intersection( it.get_covered_body_parts() ).any() ) {
                     return ret_val<bool>::make_failure( _( "Can't wear externals over one another!" ) );
+                }
+            }
+        }
+        if( it.has_flag( flag_POWERARMOR_PLATING ) ) {
+            for( auto &elem : worn ) {
+                if( elem->has_flag( flag_POWERARMOR_PLATING ) &&
+                    elem->get_covered_body_parts().make_intersection( it.get_covered_body_parts() ).any() ) {
+                    return ret_val<bool>::make_failure( _( "Can't wear overlapping sets of plating!" ) );
                 }
             }
         }
@@ -3402,7 +3412,8 @@ ret_val<bool> Character::can_wear( const item &it, bool with_equip_change ) cons
                 // To check if there's an external/exoskeleton for the mod to attach to.
                 for( std::pair< bodypart_str_id, bool > &attachment : attachments ) {
                     if( elem->get_covered_body_parts().test( attachment.first ) &&
-                        ( elem->has_flag( flag_POWERARMOR_EXO ) || elem->has_flag( flag_POWERARMOR_EXTERNAL ) ) ) {
+                        ( elem->has_flag( flag_POWERARMOR_EXO ) || elem->has_flag( flag_POWERARMOR_EXTERNAL ) ) &&
+                        !elem->has_flag( flag_POWERARMOR_PLATING ) ) {
                         if( elem->is_sided() && elem->get_side() == attachment.first->part_side ) {
                             attachment.second = true;
                         } else {
@@ -3487,7 +3498,7 @@ ret_val<bool> Character::can_wear( const item &it, bool with_equip_change ) cons
           ( it.covers( bodypart_id( "foot_r" ) ) && is_wearing_shoes( side::RIGHT ) ) ) &&
         ( !it.has_flag( flag_OVERSIZE ) || !it.has_flag( flag_OUTER ) ) && !it.has_flag( flag_SKINTIGHT ) &&
         !it.has_flag( flag_BELTED ) && !it.has_flag( flag_PERSONAL ) && !it.has_flag( flag_AURA ) &&
-        !it.has_flag( flag_SEMITANGIBLE ) ) {
+        !it.has_flag( flag_SEMITANGIBLE ) && !it.has_flag( flag_POWERARMOR_PLATING ) ) {
         // Checks to see if the player is wearing shoes
         return ret_val<bool>::make_failure( ( is_player() ? _( "You're already wearing footwear!" )
                                               : string_format( _( "%s is already wearing footwear!" ), name ) ) );
@@ -6644,7 +6655,9 @@ float Character::get_dodge_base() const
 {
     /** @EFFECT_DEX increases dodge base */
     /** @EFFECT_DODGE increases dodge_base */
-    return get_dex() / 4.0f + get_skill_level( skill_dodge );
+    return get_dex() / 4.0f + ( has_active_bionic( bionic_id( bio_cqb ) ) ? std::max( get_skill_level(
+                                    skill_dodge ), BIO_CQB_LEVEL ) : get_skill_level(
+                                    skill_dodge ) );
 }
 float Character::get_hit_base() const
 {
@@ -7384,7 +7397,7 @@ bool Character::sees_with_specials( const Creature &critter ) const
         return true;
     }
 
-    if( critter.digging() && has_active_bionic( bio_ground_sonar ) ) {
+    if( critter.digging() && has_enchantment_flag( ench_flag_SONAR ) ) {
         // Bypass the check below, the bionic sonar also bypasses the sees(point) check because
         // walls don't block sonar which is transmitted in the ground, not the air.
         // TODO: this might need checks whether the player is in the air, or otherwise not connected
@@ -7398,8 +7411,15 @@ bool Character::sees_with_specials( const Creature &critter ) const
     }
 
     const int dist = rl_dist( bub_pos(), critter.bub_pos() );
-    return ( dist <= 5 && ( has_active_mutation( trait_ANTENNAE ) ||
-                            ( has_active_bionic( bio_ground_sonar ) && !critter.has_flag( MF_FLIES ) ) ) );
+
+    // Distance cannot be 0, so this is always safe
+    if( dist <= bonus_from_enchantments( 0, ench_val_GROUNDED_CREATURE_SIGHT ) &&
+        !critter.has_flag( MF_FLIES ) ) {
+        return true;
+    }
+
+    // TODO: Add more range based enchantments here ( I.E. Limited Electrosense ranges )
+    return false;
 }
 
 detached_ptr<item> Character::pour_into( item &container, detached_ptr<item> &&liquid, int limit )
@@ -8153,9 +8173,11 @@ void Character::set_stamina( int new_stamina )
 
 void Character::mod_stamina( int mod, bool skill )
 {
+    int lost_stamina = ( stamina + mod >= 0 ) ? mod : -stamina;
     // If we're burning stamina then train athletics, unless we're losing stamina due to status effects or other non-standard causes.
-    if( skill && mod < 0 ) {
-        as_player()->practice( skill_swimming, roll_remainder( std::abs( mod ) / 500.0 ), 10, true );
+    if( skill && lost_stamina < 0 ) {
+        as_player()->practice( skill_swimming, roll_remainder( std::abs( lost_stamina ) / 500.0 ), 10,
+                               true );
         // Athletics skill also reduces stamina drain for relevant activities.
         const int skill = get_skill_level( skill_swimming );
         const float skill_cost = std::max( 0.667f, ( ( 30.0f - skill ) / 30.0f ) );
@@ -9317,10 +9339,11 @@ bool Character::armor_absorb( damage_unit &du, item &armor, const bodypart_id &b
         if( !one_in( num_parts_covered ) ) {
             return false;
         }
-        const int dmg_percent = std::max( raw_dmg - armor.chip_resistance( !armor.has_flag( flag_STURDY ) ),
-                                          1 );
-        // Chance to avoid armor damage is 50/67% (if sturdy) + 100 - ( raw_dmg - chip_resist )%
-        if( !one_in( armor.has_flag( flag_STURDY ) ? 3 : 2 ) || !x_in_y( dmg_percent, 100 ) ) {
+        const int armor_chip_resist = armor.chip_resistance( !armor.has_flag( flag_STURDY ) );
+        const bool armor_resisted = raw_dmg >= armor_chip_resist ? rng( 1,
+                                    raw_dmg ) <= armor_chip_resist : !one_in( 100 );
+        // Base chance to avoid armor damage is 50/67% (if sturdy), or if chip resist exceeds 1d<damage> (floor of 1%)
+        if( !one_in( armor.has_flag( flag_STURDY ) ? 3 : 2 ) || armor_resisted ) {
             return false;
         }
     }
@@ -9444,7 +9467,10 @@ void Character::on_dodge( Creature *source, int difficulty )
 
     // Even if we are not to train still call practice to prevent skill rust
     difficulty = std::max( difficulty, 0 );
-    as_player()->practice( skill_dodge, difficulty * 2, difficulty );
+    // Practice dodge skill except when using CQB bionic
+    if( !has_active_bionic( bio_cqb ) ) {
+        as_player()->practice( skill_dodge, difficulty * 2, difficulty );
+    }
 
     martial_arts_data->ma_ondodge_effects( *this );
 
@@ -11894,9 +11920,9 @@ bool Character::sees( const Creature &critter ) const
 {
     // This handles only the player/npc specific stuff (monsters don't have traits or bionics).
     const int dist = rl_dist( bub_pos(), critter.bub_pos() );
-    if( bub_pos().z() == critter.bub_pos().z() && dist <= 5 &&
-        ( has_active_mutation( trait_ANTENNAE ) ||
-          ( has_active_bionic( bio_ground_sonar ) && !critter.has_flag( MF_FLIES ) ) ) ) {
+    if( bub_pos().z() == critter.bub_pos().z() &&
+        dist <= bonus_from_enchantments( 0, ench_val_GROUNDED_CREATURE_SIGHT ) &&
+        !critter.has_flag( MF_FLIES ) ) {
         return true;
     }
 
