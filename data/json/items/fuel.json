@@ -20,7 +20,8 @@
     "fuel": {
       "energy": 24,
       "explosion_data": { "chance_hot": 5, "chance_cold": 10, "factor": 0.2, "fiery": true, "size_factor": 0.1 }
-    }
+    },
+    "reacts_into": { "result": "dirty_chem_ethanol", "cause": "ground_contamination" }
   },
   {
     "id": "denat_alcohol",
@@ -29,7 +30,8 @@
     "type": "AMMO",
     "description": "A high-strength ethanol solution mixed with methanol to make it toxic to drink, so as to avoid pre-apocalyptic regulations on ethanol.  Intended for use in alcohol-burning stoves and as a solvent.",
     "price": "10 cent",
-    "price_postapoc": "3 USD"
+    "price_postapoc": "3 USD",
+    "reacts_into": { "result": "dirty_denat_alcohol", "cause": "ground_contamination" }
   },
   {
     "id": "chem_methanol",
@@ -42,7 +44,8 @@
     "fuel": {
       "energy": 15.6,
       "explosion_data": { "chance_hot": 5, "chance_cold": 10, "factor": 0.2, "fiery": true, "size_factor": 0.1 }
-    }
+    },
+    "reacts_into": { "result": "dirty_chem_methanol", "cause": "ground_contamination" }
   },
   {
     "id": "diesel",
@@ -223,7 +226,8 @@
     },
     "range": 6,
     "damage": { "damage_type": "heat", "amount": 2, "armor_penetration": 2 },
-    "effects": [ "FLAME", "STREAM" ]
+    "effects": [ "FLAME", "STREAM" ],
+    "reacts_into": { "result": "dirty_motor_oil", "cause": "ground_contamination" }
   },
   {
     "id": "napalm",
@@ -346,6 +350,42 @@
     "name": { "str_sp": "dirty lamp oil" },
     "description": "Lamp oil contaminated with ground debris.  It cannot be used as fuel.",
     "ammo_type": "dirty_lamp_oil",
+    "fuel": { "energy": 13.0 }
+  },
+  {
+    "id": "dirty_chem_ethanol",
+    "copy-from": "chem_ethanol",
+    "type": "AMMO",
+    "name": { "str_sp": "dirty ethanol" },
+    "description": "Ethanol contaminated with ground debris.  It cannot be used as engine fuel.",
+    "ammo_type": "dirty_chem_ethanol",
+    "fuel": { "energy": 12.0 }
+  },
+  {
+    "id": "dirty_denat_alcohol",
+    "copy-from": "denat_alcohol",
+    "type": "AMMO",
+    "name": { "str_sp": "dirty denatured alcohol" },
+    "description": "Denatured alcohol contaminated with ground debris.  It cannot be used as engine fuel.",
+    "ammo_type": "dirty_denat_alcohol",
+    "fuel": { "energy": 12.0 }
+  },
+  {
+    "id": "dirty_chem_methanol",
+    "copy-from": "chem_methanol",
+    "type": "AMMO",
+    "name": { "str_sp": "dirty methanol" },
+    "description": "Methanol contaminated with ground debris.  It cannot be used as engine fuel.",
+    "ammo_type": "dirty_chem_methanol",
+    "fuel": { "energy": 7.8 }
+  },
+  {
+    "id": "dirty_motor_oil",
+    "copy-from": "motor_oil",
+    "type": "AMMO",
+    "name": { "str_sp": "dirty motor oil" },
+    "description": "Motor oil contaminated with ground debris.  It cannot be used as engine fuel.",
+    "ammo_type": "dirty_motor_oil",
     "fuel": { "energy": 13.0 }
   }
 ]

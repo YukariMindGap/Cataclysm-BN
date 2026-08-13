@@ -314,6 +314,30 @@
   },
   {
     "type": "ammunition_type",
+    "id": "dirty_chem_ethanol",
+    "name": "dirty ethanol",
+    "default": "dirty_chem_ethanol"
+  },
+  {
+    "type": "ammunition_type",
+    "id": "dirty_denat_alcohol",
+    "name": "dirty denatured alcohol",
+    "default": "dirty_denat_alcohol"
+  },
+  {
+    "type": "ammunition_type",
+    "id": "dirty_chem_methanol",
+    "name": "dirty methanol",
+    "default": "dirty_chem_methanol"
+  },
+  {
+    "type": "ammunition_type",
+    "id": "dirty_motor_oil",
+    "name": "dirty motor oil",
+    "default": "dirty_motor_oil"
+  },
+  {
+    "type": "ammunition_type",
     "id": "thread",
     "name": "thread",
     "default": "thread"

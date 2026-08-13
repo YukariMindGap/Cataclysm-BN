@@ -1442,4 +1442,32 @@ TEST_CASE("fluid_reaction_ground_contamination", "[iuse][fluid_reaction]") {
         water->on_drop(ground_pos, here);
         CHECK(water->typeId() == itype_id("water"));
     }
+
+    SECTION("chem_ethanol becomes dirty_chem_ethanol when dropped on bare ground") {
+        auto eth = item::spawn("chem_ethanol", calendar::start_of_cataclysm, 1);
+        CHECK(eth->typeId() == itype_id("chem_ethanol"));
+        eth->on_drop(ground_pos, here);
+        CHECK(eth->typeId() == itype_id("dirty_chem_ethanol"));
+    }
+
+    SECTION("denat_alcohol becomes dirty_denat_alcohol when dropped on bare ground") {
+        auto denat = item::spawn("denat_alcohol", calendar::start_of_cataclysm, 1);
+        CHECK(denat->typeId() == itype_id("denat_alcohol"));
+        denat->on_drop(ground_pos, here);
+        CHECK(denat->typeId() == itype_id("dirty_denat_alcohol"));
+    }
+
+    SECTION("chem_methanol becomes dirty_chem_methanol when dropped on bare ground") {
+        auto meth = item::spawn("chem_methanol", calendar::start_of_cataclysm, 1);
+        CHECK(meth->typeId() == itype_id("chem_methanol"));
+        meth->on_drop(ground_pos, here);
+        CHECK(meth->typeId() == itype_id("dirty_chem_methanol"));
+    }
+
+    SECTION("motor_oil becomes dirty_motor_oil when dropped on bare ground") {
+        auto oil = item::spawn("motor_oil", calendar::start_of_cataclysm, 1);
+        CHECK(oil->typeId() == itype_id("motor_oil"));
+        oil->on_drop(ground_pos, here);
+        CHECK(oil->typeId() == itype_id("dirty_motor_oil"));
+    }
 }
