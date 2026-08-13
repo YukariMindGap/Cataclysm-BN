@@ -1416,7 +1416,7 @@ TEST_CASE("fluid_pickup_full_consumption_removes_emptied_item", "[iuse][fluid_pi
                         return you.pour_into(container, std::move(it));
                     });
                 });
-CHECK(dmsg.empty());
+                CHECK(dmsg.empty());
                 auto stack = here.i_at(water_pos);
                 REQUIRE(stack.size() == 1);
                 CHECK((*stack.begin())->charges == 2);
