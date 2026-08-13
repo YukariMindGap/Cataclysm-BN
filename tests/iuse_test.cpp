@@ -1366,6 +1366,65 @@ TEST_CASE("fluid_pickup", "[iuse][fluid_pickup]") {
     }
 }
 
+// Regression test for the "Failed to remove emptied liquid item from stack" debugmsg.
+// When a floor liquid is fully poured into a container, item::attempt_split detaches
+// and removes the emptied item from the map stack itself, so fluid_pickup's manual
+// cleanup was both redundant and operating on a dangling reference.
+TEST_CASE("fluid_pickup_full_consumption_removes_emptied_item", "[iuse][fluid_pickup]") {
+    clear_map();
+    clear_avatar();
+
+    auto& here = get_map();
+    auto& you = get_avatar();
+    g->place_player(tripoint_bub_ms(60, 60, 0));
+
+    const auto water_pos = you.bub_pos() + tripoint_east;
+
+    GIVEN("a liquid puddle on the floor") {
+        AND_GIVEN("the puddle fits entirely into the container") {
+            // water is 250 ml per charge, bottle_plastic holds 500 ml (2 charges)
+            here.add_item_or_charges(
+                water_pos, item::spawn("water", calendar::start_of_cataclysm, 1));
+            auto bottle = item::spawn("bottle_plastic");
+            item& container = *bottle;
+            you.i_add(std::move(bottle));
+
+            THEN("pouring it into the container leaves no empty item in the stack") {
+                item& liquid = **here.i_at(water_pos).begin();
+                const auto dmsg = capture_debugmsg_during([&]() {
+                    liquid.attempt_split(0, [&you, &container](detached_ptr<item>&& it) {
+                        return you.pour_into(container, std::move(it));
+                    });
+                });
+                CHECK(dmsg.empty());
+                CHECK(here.i_at(water_pos).empty());
+            }
+        }
+
+        AND_GIVEN("the container only holds part of the puddle") {
+            // 4 charges = 1000 ml, bottle_plastic holds 500 ml (2 charges)
+            here.add_item_or_charges(
+                water_pos, item::spawn("water", calendar::start_of_cataclysm, 4));
+            auto bottle = item::spawn("bottle_plastic");
+            item& container = *bottle;
+            you.i_add(std::move(bottle));
+
+            THEN("the leftover stays on the map in the same stack") {
+                item& liquid = **here.i_at(water_pos).begin();
+                const auto dmsg = capture_debugmsg_during([&]() {
+                    liquid.attempt_split(0, [&you, &container](detached_ptr<item>&& it) {
+                        return you.pour_into(container, std::move(it));
+                    });
+                });
+CHECK(dmsg.empty());
+                auto stack = here.i_at(water_pos);
+                REQUIRE(stack.size() == 1);
+                CHECK((*stack.begin())->charges == 2);
+            }
+        }
+    }
+}
+
 TEST_CASE("fluid_reaction_ground_contamination", "[iuse][fluid_reaction]") {
     clear_map();
     clear_avatar();

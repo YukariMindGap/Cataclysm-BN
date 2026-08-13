@@ -8586,11 +8586,11 @@ int fluid_pickup_actor::use( player &p, item &it, bool, const tripoint_bub_ms & 
     const candidate &chosen = candidates[sel];
     item &target_item = *chosen.ref;
 
-    // Apply max_volume limit by splitting off excess
-    detached_ptr<item> excess;
+    // Apply max_volume limit by splitting off the excess and leaving it on the map.
+    // This must happen before handle_liquid so that only the pickable volume is offered.
     const int max_ch = target_item.charges_per_volume( max_volume );
     if( max_ch > 0 && target_item.charges > max_ch ) {
-        excess = target_item.split( target_item.charges - max_ch );
+        here.add_item_or_charges( chosen.pos, target_item.split( target_item.charges - max_ch ) );
     }
 
     // Apply retention loss: discard (1 - retention_rate) of charges
@@ -8605,54 +8605,11 @@ int fluid_pickup_actor::use( player &p, item &it, bool, const tripoint_bub_ms & 
     }
 
     // Open the standard handle_liquid menu (item stays on map, cancel-safe)
-    // In test mode, UI menus auto-cancel, so skip the call entirely
+    // In test mode, UI menus auto-cancel, so skip the call entirely.
+    // When the liquid is fully transferred, attempt_split detaches and removes the
+    // emptied item from its stack itself, so no manual cleanup is required here.
     if( !test_mode ) {
         liquid_handler::handle_liquid( target_item, 1 );
-    }
-
-    // After the transfer, merge excess back or clean up empty item
-    if( target_item.charges == 0 ) {
-        // Liquid was fully consumed; remove empty item from its stack
-        auto erase_from_stack = [&]( auto &&stack ) {
-            for( auto it = stack.begin(); it != stack.end(); ++it ) {
-                if( *it == &target_item ) {
-                    stack.erase( it );
-                    return true;
-                }
-            }
-            return false;
-        };
-
-        bool erased = false;
-        if( chosen.is_vehicle ) {
-            const optional_vpart_position veh = here.veh_at( chosen.pos );
-            if( veh ) {
-                for( const vpart_reference &vp : veh->vehicle().get_all_parts() ) {
-                    if( vp.has_feature( VPFLAG_CARGO ) && !erased ) {
-                        vehicle_stack vs = veh->vehicle().get_items( vp.part_index() );
-                        erased = erase_from_stack( vs );
-                    }
-                }
-            }
-        } else {
-            erased = erase_from_stack( here.i_at( chosen.pos ) );
-        }
-        if( !erased ) {
-            debugmsg( "Failed to remove emptied liquid item from stack" );
-        }
-
-        // Put excess back as a new stack
-        if( excess ) {
-            here.add_item_or_charges( chosen.pos, std::move( excess ) );
-        }
-    } else if( excess ) {
-        // Some liquid remains on the map; merge excess charges back
-        if( target_item.has_position() ) {
-            target_item.charges += excess->charges;
-        } else {
-            // Item was detached (e.g., poured on ground); add excess as new item
-            here.add_item_or_charges( chosen.pos, std::move( excess ) );
-        }
     }
 
     p.mod_moves( -moves );
