@@ -77,6 +77,7 @@
 #include "text_snippets.h"
 #include "translations.h"
 #include "trap.h"
+#include "type_id.h"
 #include "weather.h"
 #include "profile.h"
 #include "units_utility.h"
@@ -3403,6 +3404,7 @@ void monster::die( Creature *nkiller )
         // *only* set to true in this function!
         return;
     }
+
     // We were carrying a creature, deposit the rider
     if( has_effect( effect_ridden ) && mounted_player ) {
         mounted_player->forced_dismount();
@@ -3610,7 +3612,7 @@ static void process_item_valptr( item *ptr, monster &mon )
 {
     if( ptr && ptr->needs_processing() ) {
         ptr->attempt_detach( [&mon]( detached_ptr<item> &&it ) {
-            return item::process( std::move( it ), nullptr, mon.bub_pos(), false );
+            return item::process( std::move( it ), nullptr, mon.bub_pos(), false, 1 );
         } );
     }
 }
@@ -3621,7 +3623,7 @@ void monster::process_items()
     if( !inv.empty() ) {
         inv.remove_with( [this]( detached_ptr<item> &&it ) {
             if( it->needs_processing() ) {
-                return item::process( std::move( it ), nullptr, bub_pos(), false );
+                return item::process( std::move( it ), nullptr, bub_pos(), false, 1 );
             }
             return std::move( it );
         } );
