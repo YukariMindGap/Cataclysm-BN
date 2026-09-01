@@ -2285,7 +2285,7 @@ bool game::do_turn()
     // consider a stripped down cache just for monsters.
     {
         ZoneScopedN( "do_turn_monster_visibility_cache" );
-        m.build_map_cache( get_levz(), true );
+        m.build_map_cache( get_levz(), false );
     }
     // This has to be done after updating our map caches, as sound propagation relies on terrain.
     if( !soundperf ) {
@@ -2858,7 +2858,7 @@ auto game::execute_activity_fixed_window_skip( const time_duration &duration ) -
         cleanup_dead();
 
         if( get_levz() >= 0 && !u.is_underwater() ) {
-            handle_weather_effects( weather.weather_id );
+            handle_weather_effects( weather.weather_id, false );
         }
         u.update_bodytemp( m, weather );
         character_funcs::update_body_wetness( u, get_weather().get_precise() );
@@ -2869,6 +2869,7 @@ auto game::execute_activity_fixed_window_skip( const time_duration &duration ) -
             break;
         }
     }
+    handle_bulk_weather_field_decay( weather.weather_id, skipped_turns );
     run_activity_skip_batch_turns( skipped_turns );
     return skipped_turns;
 }
