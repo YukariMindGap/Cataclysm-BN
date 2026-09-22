@@ -1,3 +1,4 @@
+#include "../src/map/map.h"
 #include "avatar.h"
 #include "bodypart.h"
 #include "cached_options.h"
